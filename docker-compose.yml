@@ -1,0 +1,86 @@
+services:
+  keycontrol-db:
+    image: postgres:15
+    container_name: keycontrol-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Souza30072005
+      POSTGRES_DB: keycontrol
+      TZ: America/Sao_Paulo
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  solr:
+    image: solr:9
+    container_name: solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/var/solr
+    command: solr-precreate key-control-core
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8983/solr/admin/info/system || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  solr-init:
+    image: curlimages/curl:latest
+    container_name: solr-init
+    depends_on:
+      solr:
+        condition: service_healthy
+    volumes:
+      - ./solr-entrypoint.sh:/solr-entrypoint.sh
+    entrypoint: ["/bin/sh", "/solr-entrypoint.sh"]
+
+  api-backend:
+    image: backendkeycontrol:latest
+    container_name: api-backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://postgres:Souza30072005@keycontrol-db:5432/keycontrol
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SOLR_URL: http://solr:8983/solr/key-control-core
+      TZ: America/Sao_Paulo
+    depends_on:
+      keycontrol-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      solr:
+        condition: service_healthy
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+        
+volumes:
+  pg_data:
+  redis_data:
+  solr_data:
+  jenkins_home:
