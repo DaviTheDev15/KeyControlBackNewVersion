@@ -51,7 +51,6 @@ services:
 
   api-backend:
     image: davithedev/backendkeycontrol:4.0
-    container_name: api-backend
     ports:
       - "5000:5000"
     environment:
