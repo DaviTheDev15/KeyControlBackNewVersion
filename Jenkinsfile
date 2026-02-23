@@ -4,8 +4,8 @@ pipeline {
     stages {
         stage('Build e Deploy') {
             steps {
-                sh 'docker compose -f docker-compose.backend.yml down'
-                sh 'docker compose -f docker-compose.backend.yml up -d --build'
+                sh 'docker compose -f docker-compose.backend.yml -p backend down'
+                sh 'docker compose -f docker-compose.backend.yml -p backend up -d --build'
             }
         }
     }
