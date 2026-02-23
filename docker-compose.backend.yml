@@ -50,7 +50,7 @@ services:
     entrypoint: ["/bin/sh", "/solr-entrypoint.sh"]
 
   api-backend:
-    image: davithedev/backendkeycontrol:4.0
+    image: davithedev/backendkeycontrol:latest
     container_name: api-backend
     ports:
       - "5000:5000"
