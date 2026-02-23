@@ -4,9 +4,8 @@ pipeline {
     stages {
         stage('Build e Deploy') {
             steps {
-                sh 'docker compose stop api-backend || true'
-                sh 'docker compose rm -f api-backend || true'
-                sh 'docker compose up -d --build --no-deps api-backend'
+                sh 'docker compose -f docker-compose.backend.yml down'
+                sh 'docker compose -f docker-compose.backend.yml up -d --build'
             }
         }
     }

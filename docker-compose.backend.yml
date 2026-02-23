@@ -51,6 +51,7 @@ services:
 
   api-backend:
     image: davithedev/backendkeycontrol:4.0
+    container_name: api-backend
     ports:
       - "5000:5000"
     environment:
@@ -66,22 +67,8 @@ services:
         condition: service_started
       solr:
         condition: service_healthy
-
-  jenkins:
-    build:
-      context: .
-      dockerfile: Dockerfile.jenkins
-    container_name: jenkins
-    ports:
-      - "8080:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    user: root
         
 volumes:
   pg_data:
   redis_data:
   solr_data:
-  jenkins_home:
