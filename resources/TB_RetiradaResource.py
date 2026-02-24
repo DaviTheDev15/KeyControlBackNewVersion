@@ -71,8 +71,14 @@ class TB_RetiradasResource(Resource):
             hoje = date.today()
             agora = datetime.now().time()
 
+            if validado.get("data_retirada") != hoje:
+                logger.info("Não é possivel fazer retirada para um dia diferente de hoje")
+                return {"erro": "Data inválida"}, 404
+
+
             if validado.get("reserva_id") in (0, "0"):
                 validado["reserva_id"] = None
+
 
             reserva = None
 
