@@ -67,6 +67,13 @@ services:
         condition: service_started
       solr:
         condition: service_healthy
+  frontend:
+      image: jv1nicius/keycontrolfront:latest
+      container_name: keycontrol-frontend
+      ports:
+        - "3000:80"
+      depends_on:
+        - api-backend
         
 volumes:
   pg_data:
