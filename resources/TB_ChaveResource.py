@@ -157,7 +157,7 @@ class TB_ChaveResource(Resource):
 
             db.session.commit()
 
-            redis_client.delete(f"chave:{chave_id}")
+            redis_client.delete(f"chave:*")
 
             return marshal(chave, tb_chave_fields), 200
         
@@ -191,7 +191,7 @@ class TB_ChaveResource(Resource):
             db.session.delete(chave)
             db.session.commit()
 
-            redis_client.delete(f"chaves:{chave_id}")
+            redis_client.delete(f"chaves:*")
 
             return {"mensagem":"Chave removida com sucesso"}, 200
 

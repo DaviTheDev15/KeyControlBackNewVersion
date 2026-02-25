@@ -269,7 +269,7 @@ class TB_RetiradaResource(Resource):
                     chave.disponivel = True
             db.session.commit()
 
-            redis_client.delete(f"retirada:{retirada_id}")
+            redis_client.delete(f"retirada:*")
             redis_client.delete_pattern("historico:*")
 
             return marshal(retirada, tb_retirada_fields), 200
@@ -304,7 +304,7 @@ class TB_RetiradaResource(Resource):
             db.session.delete(retirada)
             db.session.commit()
             
-            redis_client.delete(f"retirada:{retirada_id}")
+            redis_client.delete(f"retirada:*")
 
             return {"mensagem":"Retirada removida com sucesso"}, 200
         

@@ -149,7 +149,7 @@ class TB_SalaResource(Resource):
             
             db.session.commit()
 
-            redis_client.delete(f"sala:{sala_id}")
+            redis_client.delete(f"sala:*")
 
             return marshal(sala, tb_sala_fields), 200
         
@@ -181,7 +181,7 @@ class TB_SalaResource(Resource):
             db.session.delete(sala)
             db.session.commit()
 
-            redis_client.delete(f"salas:{sala_id}")
+            redis_client.delete(f"salas:*")
 
             return {"mensagem":"Sala removida com sucesso"}, 200
         

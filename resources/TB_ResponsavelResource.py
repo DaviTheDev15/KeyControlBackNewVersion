@@ -213,7 +213,7 @@ class TB_ResponsavelResource(Resource):
             except Exception:
                 log_exception(f"Falha ao atualizar Solr. Id: {responsavel_id}")
 
-            redis_client.delete(f"responsavel:{responsavel_id}")
+            redis_client.delete(f"responsavel:*")
 
             return marshal(responsavel, tb_responsavel_fields), 200
 
@@ -254,7 +254,7 @@ class TB_ResponsavelResource(Resource):
             except Exception:
                 log_exception(f"Falha ao remover Solr. Id: {responsavel_id}")
 
-            redis_client.delete(f"responsavel:{responsavel_id}")
+            redis_client.delete(f"responsavel:*")
 
             return {"mensagem": "Responsável removido com sucesso"}, 200
 
