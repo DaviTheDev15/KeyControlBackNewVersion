@@ -22,7 +22,7 @@ class TB_RetiradasResource(Resource):
         logger.info("GET ALL - Listagem de Retiradas")
 
         try:
-            cache_key = "retiradas:all"
+            cache_key = "retiradas:*"
             cache = redis_client.get(cache_key)
 
             logger.info("Verificando se há dados das Retiradas no Redis!")
@@ -163,6 +163,7 @@ class TB_RetiradasResource(Resource):
             db.session.commit()
 
             redis_client.delete_pattern("retiradas:*")
+            redis_client.delete_pattern("historicos:*")
 
             return marshal(retirada, tb_retirada_fields), 201
 
@@ -187,7 +188,7 @@ class TB_RetiradaResource(Resource):
         logger.info(f"GET - Retirada {retirada_id}")
 
         try:
-            cache_key = f"retirada:{retirada_id}"
+            cache_key = f"retiradas:{retirada_id}"
             logger.info(f"Verificando se há dados da retirada {retirada_id} no Redis")
             cache = redis_client.get(cache_key)
             if cache:
@@ -269,8 +270,8 @@ class TB_RetiradaResource(Resource):
                     chave.disponivel = True
             db.session.commit()
 
-            redis_client.delete(f"retirada:*")
-            redis_client.delete_pattern("historico:*")
+            redis_client.delete(f"retiradas:*")
+            redis_client.delete_pattern("historicos:*")
 
             return marshal(retirada, tb_retirada_fields), 200
         
@@ -305,6 +306,7 @@ class TB_RetiradaResource(Resource):
             db.session.commit()
             
             redis_client.delete(f"retirada:*")
+            redis_client.delete_pattern("historicos:*")
 
             return {"mensagem":"Retirada removida com sucesso"}, 200
         

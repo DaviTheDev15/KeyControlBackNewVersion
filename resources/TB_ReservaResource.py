@@ -79,7 +79,7 @@ class TB_ReservasResource(Resource):
         logger.info("GET ALL - Listagem de Reservas")
 
         try:
-            cache_key = "reservas:all"
+            cache_key = "reservas:*"
             cache = redis_client.get(cache_key)
 
             logger.info("Verificando se há dados das Reservas no Redis!")
@@ -186,7 +186,7 @@ class TB_ReservaResource(Resource):
         logger.info(f"GET - Reserva {reserva_id}")
 
         try:
-            cache_key = f"reserva:{reserva_id}"
+            cache_key = f"reservas:{reserva_id}"
             logger.info(f"Verificando se há dados da reserva {reserva_id} no Redis")
             cache = redis_client.get(cache_key)
             if cache:
@@ -287,7 +287,7 @@ class TB_ReservaResource(Resource):
                 )
 
             db.session.commit()
-            redis_client.delete_pattern("reserva:*")
+            redis_client.delete_pattern("reservas:*")
 
             return marshal(reserva, tb_reserva_fields), 200
 
@@ -321,7 +321,7 @@ class TB_ReservaResource(Resource):
             db.session.delete(reserva)
             db.session.commit()
 
-            redis_client.delete_pattern("reserva:*")
+            redis_client.delete_pattern("reservas:*")
 
             return {"mensagem": "Reserva apagada com sucesso"}, 200
 

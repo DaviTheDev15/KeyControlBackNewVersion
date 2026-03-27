@@ -141,7 +141,7 @@ class TB_ResponsavelResource(Resource):
         logger.info(f"GET BY ID - Responsável ID {responsavel_id}")
 
         try:
-            cache_key = f"responsavel:{responsavel_id}"
+            cache_key = f"responsaveis:{responsavel_id}"
 
             logger.info(f"Verificando se há dados do Responsavel {responsavel_id} no Redis!")
             cache = redis_client.get(cache_key)

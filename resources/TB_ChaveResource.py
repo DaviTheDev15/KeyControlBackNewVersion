@@ -26,7 +26,7 @@ class TB_ChavesResource(Resource):
         logger.info("GET ALL - Listagem de Chaves")
 
         try:
-            cache_key = "chaves:all"
+            cache_key = "chaves:*"
             cache = redis_client.get(cache_key)
 
             logger.info("Verificando se há dados das Chaves no Redis!")
@@ -112,7 +112,7 @@ class TB_ChaveResource(Resource):
         logger.info(f"GET BY ID - Chave {chave_id}")
 
         try:
-            cache_key = f"chave:{chave_id}"
+            cache_key = f"chaves:{chave_id}"
             logger.info(f"Verificando se há dados da chave {chave_id} no Redis")
             cache = redis_client.get(cache_key)
             if cache:
@@ -173,7 +173,7 @@ class TB_ChaveResource(Resource):
 
             db.session.commit()
 
-            redis_client.delete(f"chave:*")
+            redis_client.delete(f"chaves:*")
 
             return marshal(chave, tb_chave_fields), 200
         

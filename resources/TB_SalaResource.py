@@ -15,7 +15,7 @@ class TB_SalasResource(Resource):
         logger.info("GET ALL - Listagem de Salas")
         
         try:
-            cache_key = "salas:all"
+            cache_key = "salas:*"
             cache = redis_client.get(cache_key)
 
             logger.info("Verificando se há dados das Salas no Redis!")
@@ -94,7 +94,7 @@ class TB_SalaResource(Resource):
         logger.info(f"GET BY ID - Sala {sala_id}")
 
         try:
-            cache_key = f"sala:{sala_id}"
+            cache_key = f"salas:{sala_id}"
             logger.info(f"Verificando se há dados da sala {sala_id} no Redis!")
             cache = redis_client.get(cache_key)
             if cache:
@@ -149,7 +149,7 @@ class TB_SalaResource(Resource):
             
             db.session.commit()
 
-            redis_client.delete(f"sala:*")
+            redis_client.delete(f"salas:*")
 
             return marshal(sala, tb_sala_fields), 200
         
