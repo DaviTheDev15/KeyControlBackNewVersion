@@ -68,7 +68,7 @@ class TB_ResponsaveisResource(Resource):
 
             resposta = marshal(responsaveis, tb_responsavel_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info("Retornando responsáveis do Banco de Dados!")
             return resposta, 200
         
@@ -164,7 +164,7 @@ class TB_ResponsavelResource(Resource):
 
             resposta = marshal(responsavel, tb_responsavel_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info(f"Responsável {responsavel_id} retornado do Banco de Dados!")
             return resposta, 200
 

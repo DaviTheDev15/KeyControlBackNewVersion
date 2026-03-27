@@ -47,7 +47,7 @@ class TB_ChavesResource(Resource):
 
             resposta = marshal(chaves, tb_chave_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info("Retornando Chaves do Banco de Dados")
             return resposta, 200
         
@@ -134,7 +134,7 @@ class TB_ChaveResource(Resource):
             
             resposta = marshal(chave, tb_chave_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info(f"Chave {chave_id} retornado do Banco de Dados!")
             return resposta, 200
         

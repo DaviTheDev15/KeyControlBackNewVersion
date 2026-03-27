@@ -45,7 +45,7 @@ class TB_RetiradasResource(Resource):
 
             resposta = marshal(retiradas, tb_retirada_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
 
             logger.info("Retornando Retiradas do Banco de Dados")
             return resposta, 200
@@ -211,7 +211,7 @@ class TB_RetiradaResource(Resource):
 
             resposta = marshal(retirada, tb_retirada_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
 
             logger.info(f"Retirada {retirada_id} retornada do Banco de Dados!")
             return resposta, 200

@@ -100,7 +100,7 @@ class TB_ReservasResource(Resource):
 
             resposta = marshal(reservas, tb_reserva_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info("Retornando Reservas do Banco de Dados")
             return resposta, 200
 
@@ -208,7 +208,7 @@ class TB_ReservaResource(Resource):
 
             resposta = marshal(reserva, tb_reserva_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info(f"Reserva {reserva_id} retornado do Banco de Dados!")
             return resposta, 200
 

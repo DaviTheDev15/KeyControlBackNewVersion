@@ -81,7 +81,7 @@ class HistoricoResource(Resource):
 
             redis_client.setex(
                 cache_key,
-                120,
+                10,
                 json.dumps(resultado, default=str)
             )
 
@@ -149,7 +149,7 @@ class HistoricoByIdResource(Resource):
 
             redis_client.setex(
                 cache_key,
-                120,
+                10,
                 json.dumps(resultado, default=str)
             )
 

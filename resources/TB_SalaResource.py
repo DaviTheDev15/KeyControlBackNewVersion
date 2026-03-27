@@ -36,7 +36,7 @@ class TB_SalasResource(Resource):
 
             resposta = marshal(salas, tb_sala_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info("Retornando Salas do Banco de Dados!")
             return resposta, 200
         
@@ -116,7 +116,7 @@ class TB_SalaResource(Resource):
             
             resposta = marshal(sala, tb_sala_fields)
 
-            redis_client.setex(cache_key, 30, json.dumps(resposta))
+            redis_client.setex(cache_key, 10, json.dumps(resposta))
             logger.info(f"Sala {sala_id} retornado do Banco de Dados!")
             return resposta, 200
         
