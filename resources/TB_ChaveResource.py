@@ -2,6 +2,7 @@ from flask import request, abort
 from flask_restful import Resource, marshal
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
 
 from helpers.database import db
 from helpers.logging import logger, log_exception
@@ -10,6 +11,15 @@ from helpers.redis_cache import redis_client
 from models.TB_Chave import TB_Chave, TB_ChaveSchema, tb_chave_fields
 from models.TB_Sala import TB_Sala
 import json
+
+def gerar_nome_da_chave(sala_id):
+    sala = db.session.get(TB_Sala, sala_id)
+    if not sala:
+        return {"erro":"Sala não encontrada"}, 404
+    total = db.session.query(func.count(TB_Chave.chave_id)).filter(TB_Chave.sala_id == sala_id).scalar()
+    numero = total + 1
+   
+    return f"Chave {sala.sala_nome} {numero:02d}"
 
 class TB_ChavesResource(Resource):
     def get(self):
@@ -65,7 +75,13 @@ class TB_ChavesResource(Resource):
                 logger.info(f"Sala não encontrada, não será possivel cadastrar uma chave para ela")
                 return {"erro":"Sala não encontrada"}, 404
             
-            nova_chave = TB_Chave(**validado)
+            nome = gerar_nome_da_chave(validado["sala_id"])
+            nova_chave = TB_Chave(
+                chave_nome = nome,
+                sala_id=validado["sala_id"],
+                disponivel=validado["disponivel"]
+            )
+
             db.session.add(nova_chave)
             db.session.commit()
 

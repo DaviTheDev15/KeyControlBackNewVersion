@@ -31,12 +31,7 @@ class TB_Chave(db.Model):
 class TB_ChaveSchema(Schema):
     chave_id = fields.Int(dump_only=True)
 
-    chave_nome = fields.Str(
-        required=True,
-        validate=validate.Length(min=2, max=255),
-        error_messages={"required":"O campo chave_nome é obrigatório.",
-        "null":"O campo chave_nome não pode ser nulo.", 
-        "validator_failed":"O campo chave_nome deve ter entre 2 a 255 caracteres."})
+    chave_nome = fields.Str(dump_only=True)
     
     sala_id = fields.Int(
         required=True,
