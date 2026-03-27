@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
+from helpers.solr import solr_client
 
 from models.TB_Sala import TB_Sala, TB_SalaSchema, tb_sala_fields
 import json
@@ -13,9 +14,33 @@ import json
 class TB_SalasResource(Resource):
     def get(self):
         logger.info("GET ALL - Listagem de Salas")
+
+        page = int(request.args.get("page", 1))
+        per_page = int(request.args.get("per_page", 50))
+        text = request.args.get("q", "*")
+
+        if text and text != "*":
+            try:
+                logger.info(f"Buscando no Solr pelo termo: {text}")
+                start = (page - 1) * per_page
+                
+                query_solr = (
+                    f"sala_nome:{text}*"
+                )
+
+                results = solr_client.search(query_solr, **{
+                    'start': start,
+                    'rows': per_page
+                })
+                
+                return list(results), 200
+
+            except Exception as e:
+                logger.info("Erro ao buscar no Solr")
+                log_exception("Erro ao buscar no Solr")
         
         try:
-            cache_key = "salas:*"
+            cache_key = f"salas:page={page}:per_page={per_page}"
             cache = redis_client.get(cache_key)
 
             logger.info("Verificando se há dados das Salas no Redis!")
@@ -66,6 +91,18 @@ class TB_SalasResource(Resource):
             db.session.commit()
 
             resposta = marshal(nova_sala, tb_sala_fields)
+            
+            try:
+                doc_solr = {
+                    "id": str(nova_sala.sala_id),
+                    "sala_id": nova_sala.sala_id,
+                    "sala_nome": nova_sala.sala_nome,
+                    "disponivel": nova_sala.disponivel
+                }
+                solr_client.add([doc_solr])
+                logger.info(f"Sala {nova_sala.sala_id} indexado no Solr.")
+            except Exception:
+                log_exception(f"Falha ao indexar no Solr. Id: {nova_sala.sala_id}")
 
             redis_client.delete_pattern("salas:*")
 
@@ -148,6 +185,18 @@ class TB_SalaResource(Resource):
                 setattr(sala, campo, valor)
             
             db.session.commit()
+
+            try:
+                doc_solr = {
+                    "id": str(sala.sala_id),
+                    "sala_id": sala.sala_id,
+                    "sala_nome": sala.sala_nome,
+                    "disponivel": sala.disponivel
+                }
+                solr_client.add([doc_solr])
+                logger.info(f"Sala {sala_id} atualizado no Solr.")
+            except Exception:
+                log_exception(f"Falha ao atualizar no Solr. Id: {sala_id}")
 
             redis_client.delete(f"salas:*")
 
