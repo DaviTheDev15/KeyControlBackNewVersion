@@ -33,7 +33,17 @@ class TB_SalasResource(Resource):
                     'rows': per_page
                 })
                 
-                return list(results), 200
+                def normalizar_doc(doc):
+                    return {
+                        "id": doc.get("id"),
+                        "sala_id": doc.get("sala_id", [None])[0],
+                        "sala_nome": doc.get("sala_nome", [""])[0],
+                        "disponivel": doc.get("disponivel", [False])[0]
+                    }
+
+                dados = [normalizar_doc(doc) for doc in results]
+
+                return dados, 200
 
             except Exception as e:
                 logger.info("Erro ao buscar no Solr")
