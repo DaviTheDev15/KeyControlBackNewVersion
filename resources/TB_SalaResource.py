@@ -94,7 +94,7 @@ class TB_SalasResource(Resource):
             
             try:
                 doc_solr = {
-                    "id": str(nova_sala.sala_id),
+                    "id": f"sala_{nova_sala.sala_id}",
                     "sala_id": nova_sala.sala_id,
                     "sala_nome": nova_sala.sala_nome,
                     "disponivel": nova_sala.disponivel

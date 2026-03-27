@@ -39,11 +39,15 @@ curl -X POST -H 'Content-type:application/json' --data-binary '{
 }' $SCHEMA_API
 
 curl -X POST -H 'Content-type:application/json' --data-binary '{
-  "add-field":{ "name":"sala_nome", "type":"text_pt", "stored":true, "indexed":true }
+  "add-field":{ "name":"sala_nome", "type":"string", "stored":true, "indexed":true }
 }' $SCHEMA_API
 
 curl -X POST -H 'Content-type:application/json' --data-binary '{
   "add-field":{ "name":"sala_id", "type":"pint", "stored":true, "indexed":true }
+}' $SCHEMA_API
+
+curl -X POST -H 'Content-type:application/json' --data-binary '{
+  "add-field":{ "name":"disponivel", "type":"boolean", "stored":true, "indexed":true }
 }' $SCHEMA_API
 
 echo "Configuração do Schema concluída com sucesso!"
