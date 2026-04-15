@@ -1,0 +1,141 @@
+2026-01-18 10:09:49,777 - INFO - GET ALL - Listagem de Salas
+2026-01-18 10:09:49,784 - INFO - Verificando se há dados das Salas no Redis!
+2026-01-18 10:09:49,787 - INFO - Redis Cache estava vazio!
+2026-01-18 10:09:49,787 - INFO - Buscando no Banco de Dados!
+2026-01-18 10:09:49,880 - INFO - Retornando Salas do Banco de Dados!
+2026-01-18 10:10:10,741 - INFO - POST - Nova Sala
+2026-01-18 10:10:36,484 - INFO - POST - Nova Sala
+2026-01-18 10:10:50,288 - INFO - POST - Nova Sala
+2026-01-18 10:11:06,377 - INFO - POST - Novo Responsável
+2026-01-18 10:11:06,381 - INFO - Dados inválidos, detalhes {'responsavel_siap': ['Not a valid string.']}
+2026-01-18 10:11:35,984 - INFO - POST - Novo Responsável
+2026-01-18 10:11:52,452 - INFO - POST - Novo Responsável
+2026-01-18 10:11:52,454 - INFO - Dados inválidos, detalhes {'responsavel_nome': ['Length must be between 4 and 255.']}
+2026-01-18 10:12:20,810 - INFO - POST - Novo Responsável
+2026-01-18 10:12:36,280 - INFO - POST - Novo Responsável
+2026-01-18 10:13:02,199 - INFO - POST - Nova Chave
+2026-01-18 10:13:35,759 - INFO - POST - Nova Chave
+2026-01-18 10:14:27,127 - INFO - POST - Nova Chave
+2026-01-18 10:16:32,817 - INFO - POST - Nova Reserva
+2026-01-18 10:16:44,176 - INFO - POST - Nova Reserva
+2026-01-18 10:20:57,342 - INFO - POST - Nova Reserva
+2026-01-18 10:21:05,440 - INFO - POST - Nova Reserva
+2026-01-18 10:21:15,101 - INFO - POST - Nova Reserva
+2026-01-18 10:21:15,104 - INFO - Responsável não encontrado ou inativo, não será possivel cadastrar uma nova reserva para ele
+2026-01-18 10:21:25,294 - INFO - POST - Nova Reserva
+2026-01-18 10:34:18,134 - INFO - GET ALL - Listagem de Reservas
+2026-01-18 10:34:18,136 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-18 10:34:18,137 - INFO - Redis Cache estava vazio!
+2026-01-18 10:34:18,137 - INFO - Buscando no Banco de Dados!
+2026-01-18 10:34:18,198 - INFO - Retornando Reservas do Banco de Dados
+2026-01-18 10:34:46,716 - INFO - PUT - Editando Reserva 40
+2026-01-18 10:34:46,720 - INFO - Dados inválidos, detalhes: {'hora_fim': 'hora_fim deve ser maior que hora_inicio.'}
+2026-01-18 10:34:55,534 - INFO - PUT - Editando Reserva 40
+2026-01-18 10:35:02,561 - INFO - PUT - Editando Reserva 40
+2026-01-18 10:35:05,486 - INFO - PUT - Editando Reserva 40
+2026-01-18 10:35:05,488 - INFO - Erro - O valor do campo hora_fim deve ser maior que o valor do campo hora_inicio.
+2026-01-18 10:35:18,011 - INFO - PUT - Editando Reserva 40
+2026-01-18 10:35:29,931 - INFO - DELETE - Apagando Reserva 40
+2026-01-18 10:35:59,597 - INFO - POST - Nova Reserva
+2026-01-18 10:35:59,599 - INFO - Dados inválidos, detalhes {'hora_fim': 'hora_fim deve ser maior que hora_inicio.'}
+2026-01-18 10:36:11,310 - INFO - POST - Nova Reserva
+2026-01-18 10:36:11,312 - INFO - Dados inválidos, detalhes {'data_fim': 'data_fim deve ser maior ou igual a data_inicio.'}
+2026-01-18 14:37:12,679 - INFO - POST - Nova Reserva
+2026-01-18 14:37:21,410 - INFO - GET ALL - Listagem de Reservas
+2026-01-18 14:37:21,411 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-18 14:37:21,411 - INFO - Redis Cache estava vazio!
+2026-01-18 14:37:21,411 - INFO - Buscando no Banco de Dados!
+2026-01-18 14:37:21,415 - INFO - Retornando Reservas do Banco de Dados
+2026-01-18 14:37:56,432 - INFO - POST - Nova Reserva
+2026-01-18 14:37:56,441 - INFO - Há um conflito de reserva, já existe uma reserva ativa para esta sala no mesmo horário e dia da semana!
+2026-01-18 14:38:11,267 - INFO - POST - Nova Reserva
+2026-01-18 14:38:11,268 - INFO - Dados inválidos, detalhes {'hora_fim': 'hora_fim deve ser maior que hora_inicio.'}
+2026-01-18 14:38:20,069 - INFO - POST - Nova Reserva
+2026-01-18 14:38:20,070 - INFO - Dados inválidos, detalhes {'data_fim': 'data_fim deve ser maior ou igual a data_inicio.'}
+2026-01-18 14:38:30,580 - INFO - POST - Nova Reserva
+2026-01-18 14:38:30,583 - INFO - Responsável não encontrado ou inativo, não será possivel cadastrar uma nova reserva para ele
+2026-01-18 14:38:40,626 - INFO - POST - Nova Reserva
+2026-01-18 14:38:40,633 - INFO - Há um conflito de reserva, já existe uma reserva ativa para esta sala no mesmo horário e dia da semana!
+2026-01-18 14:38:48,076 - INFO - POST - Nova Reserva
+2026-01-18 14:40:17,521 - INFO - PUT - Editando Reserva 41
+2026-01-18 14:40:25,179 - INFO - PUT - Editando Reserva 41
+2026-01-18 14:40:25,182 - INFO - Dados inválidos, detalhes: {'hora_fim': 'hora_fim deve ser maior que hora_inicio.'}
+2026-01-18 14:40:32,911 - INFO - PUT - Editando Reserva 41
+2026-01-18 14:40:49,797 - INFO - GET ALL - Listagem de Reservas
+2026-01-18 14:40:49,798 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-18 14:40:49,798 - INFO - Redis Cache estava vazio!
+2026-01-18 14:40:49,798 - INFO - Buscando no Banco de Dados!
+2026-01-18 14:40:49,808 - INFO - Retornando Reservas do Banco de Dados
+2026-01-18 14:46:51,303 - INFO - POST - Nova Reserva
+2026-01-18 14:46:51,303 - INFO - Dados inválidos, detalhes {'hora_inicio': ['Formato inválido. Use HH:MM.']}
+2026-01-18 14:46:58,596 - INFO - POST - Nova Reserva
+2026-01-18 14:47:13,198 - INFO - POST - Nova Reserva
+2026-01-18 14:47:19,756 - INFO - POST - Nova Reserva
+2026-01-18 14:47:19,760 - INFO - Responsável não encontrado ou inativo, não será possivel cadastrar uma nova reserva para ele
+2026-01-18 14:47:26,000 - INFO - POST - Nova Reserva
+2026-01-18 14:47:26,006 - INFO - Há um conflito de reserva, já existe uma reserva ativa para esta sala no mesmo horário e dia da semana!
+2026-01-18 14:47:39,001 - INFO - POST - Nova Reserva
+2026-01-25 10:24:26,318 - INFO - GET ALL - Listagem de Reservas
+2026-01-25 10:24:26,321 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-25 10:24:26,321 - INFO - Redis Cache estava vazio!
+2026-01-25 10:24:26,322 - INFO - Buscando no Banco de Dados!
+2026-01-25 10:24:26,435 - INFO - Retornando Reservas do Banco de Dados
+2026-01-25 10:25:01,035 - INFO - GET ALL - Listagem de Reservas
+2026-01-25 10:25:01,036 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-25 10:25:01,037 - INFO - Redis Cache estava vazio!
+2026-01-25 10:25:01,037 - INFO - Buscando no Banco de Dados!
+2026-01-25 10:25:01,044 - INFO - Retornando Reservas do Banco de Dados
+2026-01-25 10:25:56,468 - INFO - POST - Nova Reserva
+2026-01-25 10:51:31,238 - INFO - GET ALL - Listagem de Reservas
+2026-01-25 10:51:31,240 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-25 10:51:31,240 - INFO - Redis Cache estava vazio!
+2026-01-25 10:51:31,241 - INFO - Buscando no Banco de Dados!
+2026-01-25 10:51:31,309 - INFO - Retornando Reservas do Banco de Dados
+2026-01-25 10:51:38,321 - INFO - POST - Nova Reserva
+2026-01-25 10:56:54,742 - INFO - GET ALL - Listagem de Reservas
+2026-01-25 10:56:54,744 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-25 10:56:54,745 - INFO - Redis Cache estava vazio!
+2026-01-25 10:56:54,745 - INFO - Buscando no Banco de Dados!
+2026-01-25 10:56:54,783 - INFO - Retornando Reservas do Banco de Dados
+2026-01-25 10:56:59,233 - INFO - POST - Nova Reserva
+2026-01-25 10:56:59,235 - INFO - Dados inválidos, detalhes {'frequencia': ['O campo frequencia aceita apenas uma dessas opções: única, semanal, quinzenal e mensal.']}
+2026-01-25 10:57:09,541 - INFO - POST - Nova Reserva
+2026-01-25 10:57:09,542 - INFO - Dados inválidos, detalhes {'dias_semana': 'Esta frequência exige a informação de dias_semana.'}
+2026-01-25 10:57:43,282 - INFO - GET ALL - Listagem de Reservas
+2026-01-25 10:57:43,283 - INFO - Verificando se há dados das Reservas no Redis!
+2026-01-25 10:57:43,283 - INFO - Redis Cache estava vazio!
+2026-01-25 10:57:43,284 - INFO - Buscando no Banco de Dados!
+2026-01-25 10:57:43,349 - INFO - Retornando Reservas do Banco de Dados
+2026-01-25 10:57:46,254 - INFO - POST - Nova Reserva
+2026-01-25 10:58:05,574 - INFO - POST - Nova Reserva
+2026-01-25 10:58:15,658 - INFO - POST - Nova Reserva
+2026-01-25 10:58:15,659 - INFO - Dados inválidos, detalhes {'dias_semana': 'Esta frequência exige a informação de dias_semana.'}
+2026-01-25 10:58:32,791 - INFO - POST - Nova Reserva
+2026-01-25 10:58:32,791 - INFO - Dados inválidos, detalhes {'dias_semana': 'data_inicio (2026-03-12) corresponde ao dia 4, que não está em dias_semana.'}
+2026-01-25 10:58:39,254 - INFO - POST - Nova Reserva
+2026-01-25 10:59:08,983 - INFO - PUT - Editando Reserva 51
+2026-01-25 10:59:08,988 - INFO - Dados inválidos, detalhes: {'dias_semana': 'Esta frequência exige a informação de dias_semana.'}
+2026-01-25 11:10:34,131 - INFO - GET - Reserva 51
+2026-01-25 11:10:34,131 - INFO - Verificando se há dados da reserva 51 no Redis
+2026-01-25 11:10:34,132 - INFO - Redis Cache estava vazio!
+2026-01-25 11:10:34,132 - INFO - Buscando no Banco de Dados!
+2026-01-25 11:10:34,163 - INFO - Reserva 51 retornado do Banco de Dados!
+2026-01-25 11:10:38,188 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:10:58,443 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:10:58,446 - INFO - Dados inválidos, detalhes: {'frequencia': ['O campo frequencia aceita apenas uma dessas opções: única, semanal, quinzenal e mensal.']}
+2026-01-25 11:11:05,811 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:11:30,296 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:11:40,355 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:11:40,358 - INFO - Dados inválidos, detalhes: {'dias_semana': 'data_inicio (2026-03-12) corresponde ao dia 4, que não está em dias_semana.'}
+2026-01-25 11:11:47,899 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:11:59,856 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:16:56,453 - INFO - GET - Reserva 51
+2026-01-25 11:16:56,453 - INFO - Verificando se há dados da reserva 51 no Redis
+2026-01-25 11:16:56,454 - INFO - Redis Cache estava vazio!
+2026-01-25 11:16:56,454 - INFO - Buscando no Banco de Dados!
+2026-01-25 11:16:56,494 - INFO - Reserva 51 retornado do Banco de Dados!
+2026-01-25 11:17:15,357 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:17:23,260 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:17:23,264 - INFO - Dados inválidos, detalhes: {'dias_semana': 'Esta frequência exige a informação de dias_semana.'}
+2026-01-25 11:17:36,521 - INFO - PUT - Editando Reserva 51
+2026-01-25 11:17:45,268 - INFO - PUT - Editando Reserva 51
