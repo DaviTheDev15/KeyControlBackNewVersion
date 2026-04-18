@@ -187,13 +187,25 @@ class TB_SalaResource(Resource):
             sala = db.session.get(TB_Sala, sala_id)
             if not sala:
                 logger.info(f"Sala {sala_id} não encontrada")
-                return {"erro":"Sala não encontrada"}, 404
             
+                return {"erro":"Sala não encontrada"}, 404
+
+            nomeAntigo = sala.sala_nome
+
             atualizados = schema.load(dados, partial=True)
 
             for campo, valor in atualizados.items():
                 setattr(sala, campo, valor)
             
+            if "sala_nome" in atualizados and nomeAntigo != sala.sala_nome:
+                chaves = db.session.query(TB_Chave)\
+                    .filter(TB_Chave.sala_id == sala.sala_id)\
+                    .order_by(TB_Chave.chave_id)\
+                    .all()
+
+                for i, chave in enumerate(chaves, start=1):
+                    chave.chave_nome = f"Chave {sala.sala_nome} {i:02d}"
+
             db.session.commit()
 
             try:
