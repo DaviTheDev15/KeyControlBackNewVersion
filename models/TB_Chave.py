@@ -1,12 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Boolean, ForeignKey
 from helpers.database import db
-from marshmallow import Schema, fields, validate, ValidationError, validates
+from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
-
-def validate_positive(value):
-    if value <= 0:
-        raise ValidationError("O valor deve ser um número inteiro não negativo.")
+from helpers.validation_functions.generic_validations import validate_positive
+from helpers.validation_functions.chaveSchemaValidations import montarMensagemDeErro
 
 tb_chave_fields = {
     'chave_id': flaskFields.Integer,
@@ -36,15 +34,9 @@ class TB_ChaveSchema(Schema):
     sala_id = fields.Int(
         required=True,
         validate=validate_positive,
-        error_messages={
-            "required": "O campo sala_id é obrigatório.",
-            "null": "O campo sala_id não pode ser nulo.",
-            "validator_failed": "O campo sala_id deve ser valido(Maior que 0) e Corresponder a uma sala existente."
-        })
+        error_messages=montarMensagemDeErro("sala_id", 3))
     
+
     disponivel = fields.Boolean(
         required=True,
-        error_messages={
-            "required":"O campo disponivel é obrigatório.",
-            "invalid":"O campo ativo aceita apenas valores booleanos(False e True)."
-        })
+        error_messages=montarMensagemDeErro("disponivel", 2))
