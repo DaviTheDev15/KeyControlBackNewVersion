@@ -9,6 +9,7 @@ from helpers.redis_cache import redis_client
 from helpers.solr import solr_client
 
 from models.TB_Sala import TB_Sala, TB_SalaSchema, tb_sala_fields
+from models.TB_Chave import TB_Chave
 import json
 
 class TB_SalasResource(Resource):
