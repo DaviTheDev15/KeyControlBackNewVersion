@@ -35,7 +35,6 @@ class TB_ChaveSchema(Schema):
         required=True,
         validate=validate_positive,
         error_messages=montarMensagemDeErro("sala_id", 3))
-    
 
     disponivel = fields.Boolean(
         required=True,
