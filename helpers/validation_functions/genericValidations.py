@@ -1,7 +1,7 @@
 from marshmallow import ValidationError
 from flask_restful import fields as flaskFields
 from datetime import date
-from possibleValidationErrors import erros_possiveis
+from helpers.validation_functions.possibleValidationErrors import erros_possiveis
 
 class DateFormat(flaskFields.Raw):
     def format(self, value):
