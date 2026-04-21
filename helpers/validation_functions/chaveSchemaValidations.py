@@ -1,14 +1,21 @@
-def montarMensagemDeErro(nomeDoCampo, indicadorDoTipo):
-    if indicadorDoTipo == 3:
-        return {
-            "required":f"O campo {nomeDoCampo} é obrigatório.",
-            "null":f"O campo {nomeDoCampo} não pode ser nulo.",
-            "validator_failed":f"O campo {nomeDoCampo} deve ser valido(Maior que 0) e Corresponder a uma sala existente."
-        }
-    elif indicadorDoTipo == 2:
-        return {
-            "required":f"O campo {nomeDoCampo} é obrigatório.",
-            "invalid":f"O campo {nomeDoCampo} aceita apenas valores booleanos(False e True)."
-        }
-    else:
-        return {"Erro":"Tipo Invalido"}
+erros_possiveis = {
+    "required":"O campo {campo} é obrigatório.",
+    "null":"O campo {campo} não pode ser nulo.",
+    "validator_failed":"O campo {campo} deve ser valido (Maior que 0) e Corresponder a um {campo} existente.",
+    "invalid":"Formato inválido para {campo}."
+    }
+
+def montarMensagemDeErro(nomeDoCampo, listaDeTiposDeErros, tipoInvalid=None):
+    resposta = {}
+
+    for erro in listaDeTiposDeErros:
+        if erro in erros_possiveis:
+            mensagem = erros_possiveis[erro].format(campo=nomeDoCampo)
+
+            if tipoInvalid:
+                if tipoInvalid == "b":
+                    mensagem += f" Use apenas valores booleanos False ou True."
+
+            resposta[erro] = mensagem
+
+    return resposta

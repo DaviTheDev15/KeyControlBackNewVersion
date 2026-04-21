@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Boolean, ForeignKey
 from helpers.database import db
-from marshmallow import Schema, fields, validate, validates
+from marshmallow import Schema, fields
 from flask_restful import fields as flaskFields
 from helpers.validation_functions.generic_validations import validate_positive
 from helpers.validation_functions.chaveSchemaValidations import montarMensagemDeErro
@@ -34,8 +34,8 @@ class TB_ChaveSchema(Schema):
     sala_id = fields.Int(
         required=True,
         validate=validate_positive,
-        error_messages=montarMensagemDeErro("sala_id", 3))
+        error_messages=montarMensagemDeErro("sala_id",["required", "null", "validator_failed"]))
 
     disponivel = fields.Boolean(
         required=True,
-        error_messages=montarMensagemDeErro("disponivel", 2))
+        error_messages=montarMensagemDeErro("disponivel", ["required", "invalid"], "b"))
