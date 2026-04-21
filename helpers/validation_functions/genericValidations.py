@@ -1,6 +1,7 @@
 from marshmallow import ValidationError
 from flask_restful import fields as flaskFields
 from datetime import date
+from possibleValidationErrors import erros_possiveis
 
 class DateFormat(flaskFields.Raw):
     def format(self, value):
@@ -14,12 +15,7 @@ class DiasReservaField(flaskFields.Raw):
     def format(self, value):
         return [d.dia_semana for d in value] 
 
-erros_possiveis = {
-    "required":"O campo {campo} é obrigatório.",
-    "null":"O campo {campo} não pode ser nulo.",
-    "validator_failed":"O campo {campo} deve ser valido (Maior que 0) e Corresponder a um {campo} existente.",
-    "invalid":"Formato inválido para {campo}."
-    }
+
 
 def validate_positive(value):
     if value <= 0:
@@ -62,19 +58,28 @@ def validarFrequencia(data):
 
     if frequencia == "única":
         if data_fim != data_inicio:
-            raise ValidationError({
-                "data_fim": "Em um reserva única data_fim não pode ser diferente de data_inicio."
-            })
+            raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_data_fim"))
+        if len(dias_semana) > 0:
+            raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_unica_dias_semana"))
         
     if frequencia not in ("única", "mensal"):
         if not dias_semana:
-            raise ValidationError({
-                "dias_semana": (
-                    "Esta frequência exige a informação de dias_semana."
-                )
-            })
+            raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_semanal_quinzenal_dias_semana"))
 
-        if data_inicio:
+
+def validarData(data):
+    data_inicio = data.get("data_inicio")
+    data_fim = data.get("data_fim")
+    dias_semana = data.get("dias_semana", [])
+    hoje = date.today()
+
+    if data_inicio < hoje:
+        raise ValidationError(montarMensagemDeErro("data_inicio", "data_inicio"))
+    
+    if data_fim < data_inicio:
+        raise ValidationError(montarMensagemDeErro("data_fim", "data_fim"))
+    
+    if data_inicio:
             dia_real = data_inicio.weekday() + 1
 
             if dia_real not in dias_semana:
@@ -84,21 +89,6 @@ def validarFrequencia(data):
                         f"{dia_real}, que não está em dias_semana."
                     )
                 })
-
-def validarData(data):
-    data_inicio = data.get("data_inicio")
-    data_fim = data.get("data_fim")
-    hoje = date.today()
-
-    if data_inicio < hoje:
-        raise ValidationError({
-            "data_inicio": "data_inicio não pode ser uma data passada."
-        })
-    
-    if data_fim < data_inicio:
-        raise ValidationError({
-            "data_fim": "data_fim deve ser maior ou igual a data_inicio."
-        })
     
 def validarHoras(data):
     hora_inicio = data.get("hora_inicio")
@@ -108,11 +98,7 @@ def validarHoras(data):
     #agora = datetime.now().time()
 
     if hora_fim <= hora_inicio:
-        raise ValidationError({
-            "hora_fim": "hora_fim deve ser maior que hora_inicio."
-        })
+        raise ValidationError(montarMensagemDeErro("hora_fim", "hora_fim"))
     
     '''if data_inicio and hora_inicio == hoje and hora_inicio <= agora:
-        raise ValidationError({
-            "hora_inicio": "hora_inicio não pode ser um horário passado."
-        })'''
+        raise ValidationError(montarMensagemDeErro("hora_inicio", "hora_inicio"))'''
