@@ -63,6 +63,17 @@ def validarFrequencia(data):
     if frequencia not in ("única", "mensal"):
         if not dias_semana:
             raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_semanal_quinzenal_dias_semana"))
+        
+        if data_inicio:
+            dia_real = data_inicio.weekday() + 1
+
+            if dia_real not in dias_semana:
+                raise ValidationError({
+                    "dias_semana": (
+                        f"data_inicio ({data_inicio}) corresponde ao dia "
+                        f"{dia_real}, que não está em dias_semana."
+                    )
+                })
 
 
 def validarData(data):
@@ -77,16 +88,6 @@ def validarData(data):
     if data_fim < data_inicio:
         raise ValidationError(montarMensagemDeErro("data_fim", "data_fim"))
     
-    if data_inicio:
-            dia_real = data_inicio.weekday() + 1
-
-            if dia_real not in dias_semana:
-                raise ValidationError({
-                    "dias_semana": (
-                        f"data_inicio ({data_inicio}) corresponde ao dia "
-                        f"{dia_real}, que não está em dias_semana."
-                    )
-                })
     
 def validarHoras(data):
     hora_inicio = data.get("hora_inicio")
