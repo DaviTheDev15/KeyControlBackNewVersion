@@ -14,11 +14,7 @@ def montarMensagemDeErro(nomeDoCampo, listaDeTiposDeErros, horaOuData=None):
 
     for erro in listaDeTiposDeErros:
         if erro in erros_possiveis:
-            if nomeDoCampo == "dias_semana":
-                if erro == "invalid":
-                    mensagem = f"{nomeDoCampo} inválido, tente valores entre 1 e 7."
-            else:
-                mensagem = erros_possiveis[erro].format(campo=nomeDoCampo)
+            mensagem = erros_possiveis[erro].format(campo=nomeDoCampo)
 
             if horaOuData:
                 if horaOuData == "h":

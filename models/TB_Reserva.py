@@ -90,8 +90,8 @@ class TB_ReservaSchema(Schema):
 
     dias_semana = fields.List(
         fields.Int(
-            validate=validate.Range(min=1, max=7),
-            error_messages=montarMensagemDeErro("dias_semana", ["invalid"])
+            validate=validate.Range(min=1, max=7,
+            error="O campo dias_semana aceita apenas valores númericos inteiros entre 1 e 7. Sendo 1 = Segunda e 7 = Domingo."),
         ),
         required=False,
         load_only=True
