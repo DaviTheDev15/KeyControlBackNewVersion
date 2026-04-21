@@ -9,8 +9,6 @@ erros_possiveis = {
 
     "frequencia_data_fim":"Em uma reserva de {campo} única data_fim não pode ser diferente de data_inicio",
 
-    "frequencia_unica_dias_semana":"Em uma reserva de {campo} única, o campo dias_semana deve possuir uma lista vazia, [].",
-
     "frequencia_semanal_quinzenal_dias_semana":"Em uma reserva de {campo} semanal ou quinzenal, o campo dias_semana não deve possuir uma lista vazia, [].",
 
     "data_inicio":"O campo {campo} não pode ser uma data passada.",

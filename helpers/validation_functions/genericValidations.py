@@ -59,8 +59,6 @@ def validarFrequencia(data):
     if frequencia == "única":
         if data_fim != data_inicio:
             raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_data_fim"))
-        if len(dias_semana) > 0:
-            raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_unica_dias_semana"))
         
     if frequencia not in ("única", "mensal"):
         if not dias_semana:
