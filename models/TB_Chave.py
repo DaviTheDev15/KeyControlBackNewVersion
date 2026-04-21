@@ -3,8 +3,7 @@ from sqlalchemy import String, Integer, Boolean, ForeignKey
 from helpers.database import db
 from marshmallow import Schema, fields
 from flask_restful import fields as flaskFields
-from helpers.validation_functions.generic_validations import validate_positive
-from helpers.validation_functions.chaveSchemaValidations import montarMensagemDeErro
+from helpers.validation_functions.genericValidations import validate_positive, montarMensagemDeErro
 
 tb_chave_fields = {
     'chave_id': flaskFields.Integer,
