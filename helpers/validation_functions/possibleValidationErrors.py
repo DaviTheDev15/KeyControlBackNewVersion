@@ -17,7 +17,5 @@ erros_possiveis = {
 
     "hora_inicio":"O campo {campo} não pode ser um horário passado.",
     
-    "hora_fim":"O campo {campo} deve ser maior que hora_inicio.",
-
-    "unique":"O campo {campo} é unico, os valores nele não podem se repetir."
+    "hora_fim":"O campo {campo} deve ser maior que hora_inicio."
     }

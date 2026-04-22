@@ -2,7 +2,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Date, Boolean
 from helpers.database import db
 from helpers.validation_functions.genericValidations import DateFormat, validate_positive, montarDicionarioDeMensagemDeErro
-from marshmallow import Schema, fields, validate, ValidationError, validates
+from helpers.validation_functions.responsavelSchemaValidation import validar_unique_cpf, validar_unique_siap
+from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
 
 tb_responsavel_fields = {
@@ -44,7 +45,7 @@ class TB_ResponsavelSchema(Schema):
     responsavel_cpf = fields.Str(
         required=True,                         
         validate=validate.Length(min=11, max=14, error="O campo responsavel_cpf deve ter entre 11 a 14 caracteres."),
-        error_messages=montarDicionarioDeMensagemDeErro("responsavel_cpf", ["required","null", "unique"]))
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_cpf", ["required","null"]))
     
     responsavel_data_nascimento = fields.Date(
         required=True,
@@ -55,14 +56,10 @@ class TB_ResponsavelSchema(Schema):
         error_messages=montarDicionarioDeMensagemDeErro("ativo", ["required", "invalid"], "b")
     )
 
-    '''
     @validates("responsavel_cpf")
     def validate_unique_cpf(self, value, **kwargs):
-        if db.session.query(TB_Responsavel).filter_by(responsavel_cpf=value).first():
-            raise ValidationError({"unique": "Já existe um Responsavel cadastrado com esse CPF."})
+        validar_unique_cpf(value)
 
     @validates("responsavel_siap")
     def validate_unique_siap(self, value, **kwargs):
-        if db.session.query(TB_Responsavel).filter_by(responsavel_siap=value).first():
-            raise ValidationError({"unique": "Já existe um Responsavel cadastrado com esse SIAP."})
-    '''
+        validar_unique_siap(value)

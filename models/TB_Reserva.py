@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, Date, Time, String, ForeignKey
 from helpers.database import db
-from helpers.validation_functions.genericValidations import TimeFormat, DateFormat, DiasReservaField, validate_positive, montarDicionarioDeMensagemDeErro, validateReservaRules
+from helpers.validation_functions.genericValidations import TimeFormat, DateFormat, DiasReservaField, validate_positive, montarDicionarioDeMensagemDeErro
+from helpers.validation_functions.reservaSchemaValidation import validateReservaRules
 from marshmallow import Schema, fields, validate, validates_schema
 from flask_restful import fields as flaskFields
 
