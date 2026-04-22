@@ -3,7 +3,7 @@ from sqlalchemy import String, Integer, Boolean, ForeignKey
 from helpers.database import db
 from marshmallow import Schema, fields
 from flask_restful import fields as flaskFields
-from helpers.validation_functions.genericValidations import validate_positive, montarMensagemDeErro
+from helpers.validation_functions.genericValidations import validate_positive, montarDicionarioDeMensagemDeErro
 
 tb_chave_fields = {
     'chave_id': flaskFields.Integer,
@@ -33,8 +33,8 @@ class TB_ChaveSchema(Schema):
     sala_id = fields.Int(
         required=True,
         validate=validate_positive,
-        error_messages=montarMensagemDeErro("sala_id",["required", "null", "validator_failed"]))
+        error_messages=montarDicionarioDeMensagemDeErro("sala_id",["required", "null", "validator_failed"]))
 
     disponivel = fields.Boolean(
         required=True,
-        error_messages=montarMensagemDeErro("disponivel", ["required", "invalid"], "b"))
+        error_messages=montarDicionarioDeMensagemDeErro("disponivel", ["required", "invalid"], "b"))

@@ -1,14 +1,9 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Date, Boolean
 from helpers.database import db
+from helpers.validation_functions.genericValidations import DateFormat, validate_positive, montarDicionarioDeMensagemDeErro
 from marshmallow import Schema, fields, validate, ValidationError, validates
 from flask_restful import fields as flaskFields
-
-
-class DateFormat(flaskFields.Raw):
-    def format(self, value):
-        return value.isoformat() if value else None
-    
 
 tb_responsavel_fields = {
     'responsavel_id': flaskFields.Integer,
@@ -18,21 +13,14 @@ tb_responsavel_fields = {
     'responsavel_data_nascimento': DateFormat,
     'ativo': flaskFields.Boolean
 }
-
-def validate_positive(value):
-    if value <= 0:
-        raise ValidationError("O valor deve ser um número inteiro não negativo.")
     
-
 class TB_Responsavel(db.Model):
     __tablename__ = "tb_responsavel"
 
-    
     responsavel_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     responsavel_nome: Mapped[str] = mapped_column(String(255), nullable=False)
     responsavel_siap: Mapped[str] = mapped_column(String(7), nullable=True, unique=True)
     responsavel_cpf: Mapped[str] = mapped_column(String(14), nullable=False, unique=True)
-    
     responsavel_data_nascimento: Mapped[Date] = mapped_column(Date, nullable=True)
     ativo: Mapped[bool] = mapped_column(Boolean, nullable=False)
     
@@ -45,41 +33,29 @@ class TB_ResponsavelSchema(Schema):
 
     responsavel_nome = fields.Str(
         required=True,
-        validate=validate.Length(min=4, max=255),
-        error_messages={"required": "O campo responsavel_nome é obrigatório.", 
-            "null": "O campo responsavel_nome não pode ser nulo.", 
-            "validator_failed": "O campo responsavel_nome deve ter entre 4 a 255 caracteres."})
+        validate=validate.Length(min=4, max=255, error="O campo responsavel_nome deve ter entre 4 a 255 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_nome", ["required", "null"]))
 
     responsavel_siap = fields.Str(
         required=False,  
-        validate=validate.Length(equal=7),
-        error_messages={"null": "O campo responsavel_siap não pode ser nulo.", 
-            "validator_failed": "O campo responsavel_siap deve ter exatemente 7 caracteres."})
+        validate=validate.Length(equal=7, error="O campo responsavel_siap deve ter exatemente 7 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_siap", "null"))
     
     responsavel_cpf = fields.Str(
         required=True,                         
-        validate=validate.Length(min=11, max=14),
-        error_messages={"null": "O campo responsavel_cpf não pode ser nulo.", 
-            "validator_failed": "O campo responsavel_cpf deve ter entre 11 a 14 caracteres."})
-    
+        validate=validate.Length(min=11, max=14, error="O campo responsavel_cpf deve ter entre 11 a 14 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_cpf", ["required","null"]))
     
     responsavel_data_nascimento = fields.Date(
         required=True,
-        error_messages={
-            "required": "O campo data de nascimento é obrigatório.",
-            "invalid": "O campo data de nascimento deve estar no formato YYYY-MM-DD."
-        }
-    )
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_data_nascimento", ["required", "invalid"], "y"))
 
     ativo = fields.Boolean(
         required=True,
-        error_messages={
-            "required":"O campo ativo é obrigatório.",
-            "invalid":"O campo ativo aceita apenas valores booleanos(False e True)."
-        }
+        error_messages=montarDicionarioDeMensagemDeErro("ativo", ["required", "invalid"], "b")
     )
 
-
+    '''
     @validates("responsavel_cpf")
     def validate_unique_cpf(self, value, **kwargs):
         if db.session.query(TB_Responsavel).filter_by(responsavel_cpf=value).first():
@@ -89,3 +65,4 @@ class TB_ResponsavelSchema(Schema):
     def validate_unique_siap(self, value, **kwargs):
         if db.session.query(TB_Responsavel).filter_by(responsavel_siap=value).first():
             raise ValidationError({"unique": "Já existe um Responsavel cadastrado com esse SIAP."})
+    '''

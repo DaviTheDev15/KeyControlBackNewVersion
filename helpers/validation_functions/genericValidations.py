@@ -16,12 +16,11 @@ class DiasReservaField(flaskFields.Raw):
         return [d.dia_semana for d in value] 
 
 
-
 def validate_positive(value):
     if value <= 0:
         raise ValidationError("O valor deve ser um número inteiro não negativo.")
     
-def montarMensagemDeErro(nomeDoCampo, listaDeTiposDeErros, excecao=None):
+def montarDicionarioDeMensagemDeErro(nomeDoCampo, listaDeTiposDeErros, excecao=None):
     if not isinstance(listaDeTiposDeErros, (list, tuple, set)):
         listaDeTiposDeErros = [listaDeTiposDeErros]
     
@@ -31,7 +30,7 @@ def montarMensagemDeErro(nomeDoCampo, listaDeTiposDeErros, excecao=None):
         if erro in erros_possiveis:
             mensagem = erros_possiveis[erro].format(campo=nomeDoCampo)
 
-            if excecao:
+            if excecao and erro == "invalid":
                 excecao = excecao.lower()
                 if excecao[0] == "h":
                     mensagem += f" Use HH:MM."
@@ -58,11 +57,11 @@ def validarFrequencia(data):
 
     if frequencia == "única":
         if data_fim != data_inicio:
-            raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_data_fim"))
+            raise ValidationError(montarDicionarioDeMensagemDeErro("frequencia", "frequencia_data_fim"))
         
     if frequencia not in ("única", "mensal"):
         if not dias_semana:
-            raise ValidationError(montarMensagemDeErro("frequencia", "frequencia_semanal_quinzenal_dias_semana"))
+            raise ValidationError(montarDicionarioDeMensagemDeErro("frequencia", "frequencia_semanal_quinzenal_dias_semana"))
         
         if data_inicio:
             dia_real = data_inicio.weekday() + 1
@@ -83,10 +82,10 @@ def validarData(data):
     hoje = date.today()
 
     if data_inicio < hoje:
-        raise ValidationError(montarMensagemDeErro("data_inicio", "data_inicio"))
+        raise ValidationError(montarDicionarioDeMensagemDeErro("data_inicio", "data_inicio"))
     
     if data_fim < data_inicio:
-        raise ValidationError(montarMensagemDeErro("data_fim", "data_fim"))
+        raise ValidationError(montarDicionarioDeMensagemDeErro("data_fim", "data_fim"))
     
     
 def validarHoras(data):
@@ -97,7 +96,7 @@ def validarHoras(data):
     #agora = datetime.now().time()
 
     if hora_fim <= hora_inicio:
-        raise ValidationError(montarMensagemDeErro("hora_fim", "hora_fim"))
+        raise ValidationError(montarDicionarioDeMensagemDeErro("hora_fim", "hora_fim"))
     
     '''if data_inicio and hora_inicio == hoje and hora_inicio <= agora:
         raise ValidationError(montarMensagemDeErro("hora_inicio", "hora_inicio"))'''

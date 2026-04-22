@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer
 from helpers.database import db
 from marshmallow import Schema, fields, validate
-from helpers.validation_functions.genericValidations import validate_positive, montarMensagemDeErro
+from helpers.validation_functions.genericValidations import validate_positive, montarDicionarioDeMensagemDeErro
 
 class TB_ReservaDia(db.Model):
     __tablename__ = "tb_reserva_dia"
@@ -21,9 +21,9 @@ class TB_ReservaDiaSchema(Schema):
     reserva_id = fields.Int(
         required=True,
         validate=validate_positive,
-        error_messages=montarMensagemDeErro("reserva_id", ["required", "null", "validator_failed"]))
+        error_messages=montarDicionarioDeMensagemDeErro("reserva_id", ["required", "null", "validator_failed"]))
 
     dia_semana = fields.Int(
         required=True,
         validate=validate.Range(min=1, max=7),
-        error_messages=montarMensagemDeErro("dia_semana", "required"))
+        error_messages=montarDicionarioDeMensagemDeErro("dia_semana", "required"))

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, Date, Time, String, ForeignKey
 from helpers.database import db
-from helpers.validation_functions.genericValidations import TimeFormat, DateFormat, DiasReservaField, validate_positive, montarMensagemDeErro, validateReservaRules
+from helpers.validation_functions.genericValidations import TimeFormat, DateFormat, DiasReservaField, validate_positive, montarDicionarioDeMensagemDeErro, validateReservaRules
 from marshmallow import Schema, fields, validate, validates_schema
 from flask_restful import fields as flaskFields
 
@@ -46,28 +46,28 @@ class TB_ReservaSchema(Schema):
     sala_id = fields.Int(
         required=True,
         validate=validate_positive,
-        error_messages=montarMensagemDeErro("sala_id", ["required", "null", "validator_failed"]))
+        error_messages=montarDicionarioDeMensagemDeErro("sala_id", ["required", "null", "validator_failed"]))
 
     responsavel_id = fields.Int(
         required=True,
         validate=validate_positive,
-        error_messages=montarMensagemDeErro("responsavel_id", ["required", "null", "validator_failed"]))
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_id", ["required", "null", "validator_failed"]))
 
     hora_inicio = fields.Time(
         required=True,
-        error_messages=montarMensagemDeErro("hora_inicio", ["required", "null", "invalid"], "h"))
+        error_messages=montarDicionarioDeMensagemDeErro("hora_inicio", ["required", "null", "invalid"], "h"))
 
     hora_fim = fields.Time(
         required=True,
-        error_messages=montarMensagemDeErro("hora_fim", ["required", "null", "invalid"], "h"))
+        error_messages=montarDicionarioDeMensagemDeErro("hora_fim", ["required", "null", "invalid"], "h"))
 
     data_inicio = fields.Date(
         required=True,
-        error_messages=montarMensagemDeErro("data_inicio", ["required", "null", "invalid"], "d"))
+        error_messages=montarDicionarioDeMensagemDeErro("data_inicio", ["required", "null", "invalid"], "d"))
 
     data_fim = fields.Date(
         required=True,
-        error_messages=montarMensagemDeErro("data_fim", ["required", "null", "invalid"], "d")
+        error_messages=montarDicionarioDeMensagemDeErro("data_fim", ["required", "null", "invalid"], "d")
     )
 
     frequencia = fields.Str(
@@ -76,7 +76,7 @@ class TB_ReservaSchema(Schema):
             ["única","semanal", "quinzenal", "mensal"],
             error="O campo frequencia aceita apenas uma dessas opções: única, semanal, quinzenal e mensal."
         ),
-        error_messages=montarMensagemDeErro("frequencia", ["required", "null"]))
+        error_messages=montarDicionarioDeMensagemDeErro("frequencia", ["required", "null"]))
 
     status = fields.Str(
         required=True,
@@ -84,7 +84,7 @@ class TB_ReservaSchema(Schema):
             ["ativa", "cancelada", "finalizada"],
             error="O campo status aceita apenas uma dessas opções: ativa, cancelada, finalizada."
         ),
-        error_messages=montarMensagemDeErro("status", ["required", "null"])
+        error_messages=montarDicionarioDeMensagemDeErro("status", ["required", "null"])
     )
 
     dias_semana = fields.List(
