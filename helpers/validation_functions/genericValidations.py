@@ -17,7 +17,7 @@ class DiasReservaField(flaskFields.Raw):
 
 def validate_positive(value):
     if value <= 0:
-        raise ValidationError("O valor deve ser um número inteiro não negativo.")
+        raise ValidationError(montarDicionarioDeMensagemDeErro("validate_positive", "validate_positive"))
     
 def montarDicionarioDeMensagemDeErro(nomeDoCampo, listaDeTiposDeErros, excecao=None):
     if not isinstance(listaDeTiposDeErros, (list, tuple, set)):
