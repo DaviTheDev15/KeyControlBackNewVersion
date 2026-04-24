@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, Integer
 from helpers.database import db
+from helpers.validation_functions.genericValidations import montarDicionarioDeMensagemDeErro
 from marshmallow import Schema, fields, validate, ValidationError, validates
 from flask_restful import fields as flaskFields
 
@@ -38,36 +39,17 @@ class TB_UsuarioSchema(Schema):
     usuario_id = fields.Int(dump_only=True)
     usuario_nome = fields.Str(
         required=True,
-        validate=validate.Length(min=3, max=255),
-        error_messages={
-            "required": "O campo usuario_nome é obrigatório",
-            "null": "O campo usuario_nome não pode ser nulo.",
-            "validator_failed": "O campo usuario_nome deve ter entre 2 a 255 caracteres."
-        }
-    )
+        validate=validate.Length(min=3, max=255, error="O campo usuario_nome deve ter entre 2 a 255 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("usuario_nome", ["required", "null"]))
     email = fields.Email(
         required=True,
-        error_messages={
-            "required": "O campo email é obrigatório",
-            "invalid": "Email inválido"
-        }
-    )
+        error_messages=montarDicionarioDeMensagemDeErro("email", ["required", "invalid"]))
     senha = fields.Str(
         required=True,
-        validate=validate.Length(min=8, max=255),
-        error_messages={
-            "required": "O campo senha é obrigatório",
-            "null": "O campo senha não pode ser nulo.",
-            "validator_failed": "O campo senha deve ter no mínimo 8 dígitos."
-        }
-    )
+        validate=validate.Length(min=8, max=255, error="O campo senha deve ter entre 8 a 255 caracteres"),
+        error_messages=montarDicionarioDeMensagemDeErro("senha", ["required", "null"]))
     funcao = fields.Str(
         required=True,
-        validate=validate.Length(min=3, max=255),
-        error_messages={
-            "required": "O campo funcao é obrigatório",
-            "null": "O campo funcao não pode ser nulo.",
-            "validator_failed": "O campo funcao deve ter entre 2 a 255 caracteres."
-        }
-    )
+        validate=validate.Length(min=3, max=255, error="O campo funcao deve ter entre 2 a 255 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("funcao", ["required", "null"]))
 

@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Boolean
 from helpers.database import db
-from marshmallow import Schema, fields, validate, ValidationError, validates
+from helpers.validation_functions.genericValidations import montarDicionarioDeMensagemDeErro
+from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
 
 tb_sala_fields = {
@@ -26,15 +27,9 @@ class TB_SalaSchema(Schema):
     
     sala_nome = fields.Str(
         required=True,
-        validate=validate.Length(min=2, max=255),
-        error_messages={"required": "O campo sala_nome é obrigatório.", 
-            "null": "O campo sala_nome não pode ser nulo.", 
-            "validator_failed": "O campo sala_nome deve ter entre 2 a 255 caracteres."})
+        validate=validate.Length(min=2, max=255, error="O campo sala_nome deve ter entre 2 a 255 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("sala_nome", ["required", "null"]))
     
     disponivel = fields.Boolean(
         required=True,
-        error_messages={
-            "required":"O campo disponivel é obrigatório.",
-            "invalid":"O campo ativo aceita apenas valores booleanos(False e True)."
-        }
-    )
+        error_messages=montarDicionarioDeMensagemDeErro("disponivel", ["required", "invalid"]))
