@@ -83,6 +83,6 @@ class TB_RetiradaSchema(Schema):
         )
     )
 
-@validates_schema
-def validate_retirada(self, data, **kwargs):
-    validateRetiradaRules(self, data)
+    @validates_schema
+    def validate_retirada(self, data, **kwargs):
+        validateRetiradaRules(self, data)
