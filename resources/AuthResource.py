@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import request
+from flask import request, make_response
 from models.TB_Usuario import TB_Usuario
 
 from flask_jwt_extended import create_access_token
@@ -25,10 +25,22 @@ class AuthResource(Resource):
                 "funcao": usuario.funcao
             }
         )
-
-        return {
+        
+        data = {
             "message": "Login realizado com sucesso",
-            "access_token": access_token,
             "usuario": usuario.usuario_nome,
             "funcao": usuario.funcao
-        }, 200
+        }
+
+        response = make_response(data, 200)
+        
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+            max_age=60 * 60 * 1
+        )
+
+        return response
