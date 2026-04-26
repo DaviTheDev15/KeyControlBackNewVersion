@@ -31,7 +31,7 @@ def validarHora(self, data):
     tolerancia = agora - timedelta(minutes=5)
 
     #if data_retirada == hoje and hora_retirada:
-    if hora_retirada:
+    if hora_retirada and data_retirada:
         if data_retirada == hoje:
             retirada_dt = datetime.combine(hoje, hora_retirada)
             if retirada_dt < tolerancia:
