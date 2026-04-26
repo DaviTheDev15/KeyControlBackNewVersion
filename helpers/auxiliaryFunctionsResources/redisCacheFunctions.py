@@ -12,6 +12,7 @@ def setCacheKey(valor, adicional=None):
 
 def verificarRedisCache(nomeDoCampo,cacheKey):
     try:
+        print(cacheKey)
         cache = redis_client.get(cacheKey)
         logger.info(f"Verificando dados de {nomeDoCampo} no Redis Cache")
         return cache
