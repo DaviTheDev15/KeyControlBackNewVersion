@@ -14,11 +14,10 @@ def verificarRedisCache(nomeDoCampo,cacheKey):
     try:
         cache = redis_client.get(cacheKey)
         logger.info(f"Verificando dados de {nomeDoCampo} no Redis Cache")
-        if cache:
-            return cache
+        return cache
         
     except Exception:
-        log_exception(f"Erro ao acessar Redis de{nomeDoCampo}")
+        log_exception(f"Erro ao acessar Redis de {nomeDoCampo}")
         abort(500, f"Erro ao acessar Redis Cache de {nomeDoCampo}")
 
 def preencherRedisCache(cacheKey, resultado):
