@@ -17,9 +17,9 @@ class HistoricoResource(Resource):
             
             cache = verificarRedisCache("historico", cacheKey)
 
-            logger.info("Retornando Historico de Retiradas do Redis")
-
-            return json.loads(cache), 200
+            if cache:
+                logger.info("Retornando Historico de Retiradas do Redis")
+                return json.loads(cache), 200
 
         except Exception:
             log_exception("Erro ao retornar Historico de Retiradas do Redis Cache")
