@@ -13,9 +13,7 @@ class HistoricoResource(Resource):
         logger.info("GET ALL - Histórico de Retiradas")
 
         try:
-            cacheKey = setCacheKey("historico")
-
-            #cache_key = f"historico:{json.dumps(request.args, sort_keys=True)}"
+            cacheKey = f"historico:{json.dumps(request.args, sort_keys=True)}"
             
             cache = verificarRedisCache("historico", cacheKey)
 
