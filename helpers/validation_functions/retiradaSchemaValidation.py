@@ -47,7 +47,7 @@ def validarHora(self, data):
             raise ValidationError(montarDicionarioDeMensagemDeErro("hora_devolucao", "hora_devolucao"))
 
 
-    if not self.partial and hora_devolucao:
+    if request.method == "POST" and hora_devolucao:
         raise ValidationError(montarDicionarioDeMensagemDeErro("hora_devolucao", "post_hora_devolucao"))
 
     if status == "devolvida" and not hora_devolucao:
