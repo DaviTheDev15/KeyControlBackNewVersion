@@ -58,7 +58,7 @@ def sqlRequisicaoGetAll():
             }
         for row in resultado]
 
-        return resultado, 200
+        return resultado
 
     except Exception:
         log_exception("Erro ao buscar Historico de Retiradas")
