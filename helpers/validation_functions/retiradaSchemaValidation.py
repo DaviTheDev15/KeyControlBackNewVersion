@@ -40,7 +40,7 @@ def validarHora(self, data):
         raise ValidationError(montarDicionarioDeMensagemDeErro("hora_prevista_devolucao", "hora_prevista_devolucao"))
 
     #if hora_devolucao and hora_retirada and hora_devolucao < hora_retirada:
-    if hora_devolucao < hora_retirada:
+    if hora_devolucao and hora_devolucao < hora_retirada:
         raise ValidationError(montarDicionarioDeMensagemDeErro("hora_devolucao", "hora_devolucao"))
 
 
