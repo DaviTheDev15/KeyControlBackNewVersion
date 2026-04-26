@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from sqlalchemy import text
-from flask import request, abort
+from flask import request, abort, jsonify
 from helpers.database import db
 from helpers.logging import logger, log_exception
 import json
@@ -34,7 +34,7 @@ class HistoricoResource(Resource):
             preencherRedisCache(cacheKey, resultado)
 
             logger.info("Retornando Retiradas do Banco de Dados")
-            return resultado
+            return jsonify(resultado), 200
 
         except Exception:
             log_exception("Erro ao retornar Historico de Retiradas do Banco de Dados")
