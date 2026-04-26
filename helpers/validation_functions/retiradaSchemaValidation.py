@@ -17,7 +17,7 @@ def validarData(data):
     data_retirada = data.get("data_retirada")
     hoje = date.today()
 
-    if data_retirada != hoje:
+    if data_retirada is not None and data_retirada != hoje:
         raise ValidationError(montarDicionarioDeMensagemDeErro("data_retirada", "data_retirada"))
     
 def validarHora(self, data):
