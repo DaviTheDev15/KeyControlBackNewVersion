@@ -31,18 +31,19 @@ def validarHora(self, data):
     tolerancia = agora - timedelta(minutes=5)
 
     #if data_retirada == hoje and hora_retirada:
-    if data_retirada == hoje:
-        retirada_dt = datetime.combine(hoje, hora_retirada)
-
-        if retirada_dt < tolerancia:
-            raise ValidationError(montarDicionarioDeMensagemDeErro("hora_retirada", "hora_retirada"))
+    if data_retirada:
+        if data_retirada == hoje:
+            retirada_dt = datetime.combine(hoje, hora_retirada)
+            if retirada_dt < tolerancia:
+                raise ValidationError(montarDicionarioDeMensagemDeErro("hora_retirada", "hora_retirada"))
 
     if hora_prevista <= hora_retirada:
         raise ValidationError(montarDicionarioDeMensagemDeErro("hora_prevista_devolucao", "hora_prevista_devolucao"))
 
     #if hora_devolucao and hora_retirada and hora_devolucao < hora_retirada:
-    if hora_devolucao and hora_devolucao < hora_retirada:
-        raise ValidationError(montarDicionarioDeMensagemDeErro("hora_devolucao", "hora_devolucao"))
+    if hora_devolucao:
+        if hora_devolucao < hora_retirada:
+            raise ValidationError(montarDicionarioDeMensagemDeErro("hora_devolucao", "hora_devolucao"))
 
 
     if not self.partial and hora_devolucao:
