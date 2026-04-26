@@ -1,6 +1,7 @@
 from marshmallow import ValidationError
 from helpers.validation_functions.genericValidations import montarDicionarioDeMensagemDeErro
 from datetime import date, datetime, timedelta
+from flask import request
 
 def validateRetiradaRules(self, data):
     validarStatus(self, data)
@@ -8,7 +9,7 @@ def validateRetiradaRules(self, data):
     validarHora(self, data)
 
 def validarStatus(self,data):
-    if not self.partial:
+    if request.method == "POST":
         if data.get("status") != "retirada":
             raise ValidationError(montarDicionarioDeMensagemDeErro("status", "status"))
 
