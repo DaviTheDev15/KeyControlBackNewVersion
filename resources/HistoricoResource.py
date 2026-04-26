@@ -34,7 +34,7 @@ class HistoricoResource(Resource):
             preencherRedisCache(cacheKey, resultado)
 
             logger.info("Retornando Retiradas do Banco de Dados")
-            return jsonify(resultado), 200
+            return resultado, 200
 
         except Exception:
             log_exception("Erro ao retornar Historico de Retiradas do Banco de Dados")
