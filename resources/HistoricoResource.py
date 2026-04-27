@@ -6,7 +6,7 @@ from helpers.logging import logger, log_exception
 import json
 from helpers.redis_cache import redis_client
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import setCacheKey, verificarRedisCache, preencherRedisCache
-from helpers.auxiliaryFunctionsResources.sqlRequestForHistory import sqlRequisicaoGetAll
+from helpers.auxiliaryFunctionsResources.sqlRequestForHistory import sqlRequisicaoGetAll, sqlRequisicaoGetById
 
 class HistoricoResource(Resource):
     def get(self):
@@ -15,7 +15,7 @@ class HistoricoResource(Resource):
         try:
             cacheKey = f"historico:{json.dumps(request.args, sort_keys=True)}"
             
-            cache = verificarRedisCache("historico", cacheKey)
+            cache = verificarRedisCache("Historico de Retiradas", cacheKey)
 
             if cache:
                 logger.info("Retornando Historico de Retiradas do Redis")
@@ -26,14 +26,14 @@ class HistoricoResource(Resource):
             abort(500, "Erro ao retornar Historico de Retiradas do Redis Cache")
 
         try:
-            logger.info("Redis vazio!")
+            logger.info("Redis Cache vazio!")
             logger.info("Buscando Retiradas no Banco de Dados")
 
             resultado = sqlRequisicaoGetAll()
 
             preencherRedisCache(cacheKey, resultado)
 
-            logger.info("Retornando Retiradas do Banco de Dados")
+            logger.info("Retornando o Historico de Retiradas do Banco de Dados")
             return resultado, 200
 
         except Exception:
@@ -46,63 +46,28 @@ class HistoricoByIdResource(Resource):
         logger.info(f"GET - Histórico Retirada {retirada_id}")
 
         try:
-            cache_key = f"historico:{retirada_id}"
-            cache = redis_client.get(cache_key)
+            cacheKey = setCacheKey("historico", retirada_id)
+            cache = verificarRedisCache("Historico de Retiradas", cacheKey)
 
             if cache:
-                logger.info("Retornando histórico por ID do Redis")
+                logger.info(f"Retornando Historico da Retirada {retirada_id} do Redis Cache")
                 return json.loads(cache), 200
 
         except Exception:
-            log_exception("Erro ao acessar Redis (Histórico by ID)")
-            abort(500, "Erro ao acessar cache")
+            log_exception(f"Erro ao retornar o Historico da Retirada {retirada_id} do Redis Cache")
+            abort(500, f"Erro ao retornar o Historico da Retirada {retirada_id} do Redis Cache")
 
         try:
-            logger.info("Buscando Retirada no Banco de Dados")
+            logger.info("Redis Cache vazio!")
+            logger.info(f"Buscando o Historico da Retirada {retirada_id} no Banco de Dados")
 
-            sql = """
-                SELECT
-                    r.retirada_id,
-                    r.data_retirada,
-                    r.hora_retirada,
-                    r.hora_prevista_devolucao,
-                    r.hora_devolucao,
-                    r.status,
+            resultado = sqlRequisicaoGetById(retirada_id)
 
-                    s.sala_id,
-                    s.sala_nome,
+            preencherRedisCache(cacheKey, resultado)
 
-                    c.chave_id,
-                    c.chave_nome,
-
-                    resp.responsavel_id,
-                    resp.responsavel_nome
-                FROM tb_retirada r
-                JOIN tb_chave c ON c.chave_id = r.chave_id
-                JOIN tb_sala s ON s.sala_id = c.sala_id
-                JOIN tb_responsavel resp ON resp.responsavel_id = r.responsavel_id
-                WHERE r.status = 'devolvida'
-                  AND r.retirada_id = :retirada_id
-            """
-
-            row = db.session.execute(
-                text(sql),
-                {"retirada_id": retirada_id}
-            ).mappings().first()
-
-            if not row:
-                return {"erro": "Histórico não encontrado"}, 404
-
-            resultado = dict(row)
-
-            redis_client.setex(
-                cache_key,
-                10,
-                json.dumps(resultado, default=str)
-            )
-
+            logger.info(f"Retornando o Historico da Retirada {retirada_id} do Banco de Dados")
             return resultado, 200
 
         except Exception:
-            log_exception("Erro ao buscar histórico por ID")
-            abort(500, "Erro ao buscar histórico")
+            log_exception(f"Erro ao retornar o Historico da Retirada {retirada_id} do Banco de Dados")
+            abort(500, f"Erro ao retornar o Historico da Retiradas {retirada_id} do Banco de Dados")
