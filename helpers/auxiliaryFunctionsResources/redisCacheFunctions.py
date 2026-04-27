@@ -3,13 +3,6 @@ from helpers.logging import logger, log_exception
 from flask import request, abort
 import json
 
-def setCacheKey(valor, adicional=None):
-    cacheKey = ""
-    if adicional:
-        return cacheKey == f"{valor}:{adicional}"
-    else:
-        return cacheKey == f"{valor}:*"
-
 def verificarRedisCache(nomeDoCampo,cacheKey):
     try:
         print(cacheKey)

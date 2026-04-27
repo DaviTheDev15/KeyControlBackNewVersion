@@ -5,7 +5,7 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 import json
 from helpers.redis_cache import redis_client
-from helpers.auxiliaryFunctionsResources.redisCacheFunctions import setCacheKey, verificarRedisCache, preencherRedisCache
+from helpers.auxiliaryFunctionsResources.redisCacheFunctions import verificarRedisCache, preencherRedisCache
 from helpers.auxiliaryFunctionsResources.sqlRequestForHistory import sqlRequisicaoGetAll, sqlRequisicaoGetById
 
 class HistoricoResource(Resource):
