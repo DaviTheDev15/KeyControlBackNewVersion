@@ -46,7 +46,7 @@ class HistoricoByIdResource(Resource):
         logger.info(f"GET - Histórico Retirada {retirada_id}")
 
         try:
-            cacheKey = setCacheKey("historico", retirada_id)
+            cacheKey = f"historico:{retirada_id}"
             cache = verificarRedisCache("Historico de Retiradas", cacheKey)
 
             if cache:
