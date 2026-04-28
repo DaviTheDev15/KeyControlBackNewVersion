@@ -29,12 +29,12 @@ class HistoricoResource(Resource):
             logger.info("Redis Cache vazio!")
             logger.info("Buscando Retiradas no Banco de Dados")
 
-            resultado = sqlRequisicaoGetAll()
+            resposta = sqlRequisicaoGetAll()
 
-            preencherRedisCache(cacheKey, resultado)
+            preencherRedisCache(cacheKey, resposta)
 
             logger.info("Retornando o Historico de Retiradas do Banco de Dados")
-            return resultado, 200
+            return resposta, 200
 
         except Exception:
             log_exception("Erro ao retornar Historico de Retiradas do Banco de Dados")
@@ -61,12 +61,12 @@ class HistoricoByIdResource(Resource):
             logger.info("Redis Cache vazio!")
             logger.info(f"Buscando o Historico da Retirada {retirada_id} no Banco de Dados")
 
-            resultado = sqlRequisicaoGetById(retirada_id)
+            resposta = sqlRequisicaoGetById(retirada_id)
 
-            preencherRedisCache(cacheKey, resultado)
+            preencherRedisCache(cacheKey, resposta)
 
             logger.info(f"Retornando o Historico da Retirada {retirada_id} do Banco de Dados")
-            return resultado, 200
+            return resposta, 200
 
         except Exception:
             log_exception(f"Erro ao retornar o Historico da Retirada {retirada_id} do Banco de Dados")
