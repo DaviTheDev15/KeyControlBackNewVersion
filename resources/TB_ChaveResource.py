@@ -21,7 +21,7 @@ class TB_ChavesResource(Resource):
 
         try:
             cacheKey = "chaves:*"
-            
+
             cache = verificarRedisCache("Chaves", cacheKey)
 
             if cache:
@@ -67,7 +67,7 @@ class TB_ChavesResource(Resource):
         try:
             validado = schema.load(dados)
 
-            salaVerification(validado)
+            salaVerification(validado["sala_id"])
             
             nome = gerar_nome_da_chave(validado["sala_id"])
 
@@ -128,9 +128,7 @@ class TB_ChaveResource(Resource):
 
             chave = db.session.get(TB_Chave, chave_id)
 
-            if not chave:
-                logger.info(f"Chave {chave_id} não encontrada")
-                return {"erro": "Chave não encontrada"}, 404
+            chaveVerification(chave_id)
             
             resposta = marshal(chave, tb_chave_fields)
 
