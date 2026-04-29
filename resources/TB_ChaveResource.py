@@ -12,7 +12,7 @@ from helpers.auxiliaryFunctionsResources.redisCacheFunctions import verificarRed
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification, chaveVerification
 
 from models.TB_Chave import TB_Chave, TB_ChaveSchema, tb_chave_fields
-from models.TB_Sala import TB_Sala
+
 import json
 
 class TB_ChavesResource(Resource):
