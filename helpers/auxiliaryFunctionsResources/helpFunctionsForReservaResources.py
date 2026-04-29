@@ -6,6 +6,7 @@ def existe_conflito_reserva_raw(
     hora_inicio,
     hora_fim,
     data_inicio,
+    dias_semana,
     reserva_id_excluir=None
 ):
     dia_semana = data_inicio.weekday() + 1
