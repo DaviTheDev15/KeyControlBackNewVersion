@@ -2,141 +2,79 @@ from flask import request, abort
 from flask_restful import Resource, marshal
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import text
 from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
-
+from helpers.auxiliaryFunctionsResources.helpFunctionsForReservaResources import existe_conflito_reserva_raw, merge_reserva
+from helpers.auxiliaryFunctionsResources.redisCacheFunctions import verificarRedisCache, preencherRedisCache
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification, responsavelIsActive, responsavelVerification, reservaVerification, reservaStatusIsAtiva
 from models.TB_Reserva import TB_Reserva, TB_ReservaSchema, tb_reserva_fields
 from models.TB_ReservaDia import TB_ReservaDia
-from models.TB_Sala import TB_Sala
-from models.TB_Responsavel import TB_Responsavel
 
 import json
-
-def existe_conflito_reserva_raw(
-    sala_id,
-    hora_inicio,
-    hora_fim,
-    data_inicio,
-    dias_semana,
-    reserva_id_excluir=None
-):
-    dia_semana = data_inicio.weekday() + 1
-    dia_mes = data_inicio.day
-
-    sql = text("""
-        SELECT 1
-        FROM tb_reserva r
-        LEFT JOIN tb_reserva_dia d ON d.reserva_id = r.reserva_id
-        WHERE r.status = 'ativa'
-          AND r.sala_id = :sala_id
-          AND (:hora_inicio < r.hora_fim AND :hora_fim > r.hora_inicio)
-          AND r.data_inicio <= :data_inicio
-          AND (r.data_fim IS NULL OR r.data_fim >= :data_inicio)
-          AND (
-                -- 🔹 semanal
-                (r.frequencia = 'semanal' AND d.dia_semana = :dia_semana)
-
-                -- 🔹 mensal
-                OR (r.frequencia = 'mensal' AND EXTRACT(DAY FROM r.data_inicio) = :dia_mes)
-
-                -- 🔹 única
-                OR (r.frequencia = 'única' AND r.data_inicio = :data_inicio)
-          )
-          AND (:reserva_id_excluir IS NULL OR r.reserva_id <> :reserva_id_excluir)
-        LIMIT 1
-    """)
-
-    params = {
-        "sala_id": sala_id,
-        "hora_inicio": hora_inicio,
-        "hora_fim": hora_fim,
-        "data_inicio": data_inicio,
-        "dia_semana": dia_semana,
-        "dia_mes": dia_mes,
-        "reserva_id_excluir": reserva_id_excluir
-    }
-
-    return db.session.execute(sql, params).fetchone() is not None
-
-
-def merge_reserva(reserva, dados):
-    return {
-        "sala_id": dados.get("sala_id", reserva.sala_id),
-        "responsavel_id": dados.get("responsavel_id", reserva.responsavel_id),
-        "hora_inicio": dados.get("hora_inicio", reserva.hora_inicio),
-        "hora_fim": dados.get("hora_fim", reserva.hora_fim),
-        "data_inicio": dados.get("data_inicio", reserva.data_inicio),
-        "data_fim": dados.get("data_fim", reserva.data_fim),
-        "frequencia": dados.get("frequencia", reserva.frequencia),
-        "status": dados.get("status", reserva.status),
-    }
-
 
 class TB_ReservasResource(Resource):
     def get(self):
         logger.info("GET ALL - Listagem de Reservas")
 
         try:
-            cache_key = "reservas:*"
-            cache = redis_client.get(cache_key)
+            cachekey = "reservas:*"
 
-            logger.info("Verificando se há dados das Reservas no Redis!")
+            cache = verificarRedisCache("Reservas", cachekey)
+
             if cache:
                 logger.info("Retornando Reservas do Redis")
                 return json.loads(cache), 200
             
         except Exception:
-            logger.info("Erro ao acessar o Redis Cache")
-            log_exception("Erro ao acessar Redis")
-            abort(500, "Erro ao acessar cache")
+            log_exception("Erro ao retornar Reservas do Redis Cache")
+            abort(500, "Erro ao retornar Reservas do Redis Cache")
 
         try:
-            logger.info("Redis Cache estava vazio!")
-            logger.info("Buscando no Banco de Dados!")
+            logger.info("Redis Cache vazio!")
+            logger.info("Buscando Reservas no Banco de Dados!")
+
             query = db.select(TB_Reserva).order_by(TB_Reserva.reserva_id)
+
             reservas = db.session.execute(query).scalars().all()
 
             resposta = marshal(reservas, tb_reserva_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(cachekey, resposta)
+
             logger.info("Retornando Reservas do Banco de Dados")
+
             return resposta, 200
 
         except SQLAlchemyError:
             log_exception("Erro SQLAlchemy ao buscar TB_Reservas")
-            logger.info("Erro SQLAlchemy ao buscar TB_Reservas")
             db.session.rollback()
             abort(500, "Erro ao buscar TB_Reservas no banco de dados")
 
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Reservas")
-            logger.info("Erro inesperado ao buscar TB_Reservas")
             abort(500, description="Erro interno inesperado.")
 
     def post(self):
         logger.info("POST - Nova Reserva")
-        dados = request.get_json()
-        schema = TB_ReservaSchema()
-        
 
+        dados = request.get_json()
+
+        schema = TB_ReservaSchema()
         try:
             validado = schema.load(dados)
+
             dias_semana = validado.pop("dias_semana", [])
+
             if validado["frequencia"] == "única":
                 validado["data_fim"] = validado["data_inicio"]
-            sala = db.session.get(TB_Sala, validado["sala_id"])
 
-            if not sala:
-                logger.info(f"Sala não encontrada, não será possivel cadastrar uma nova reserva para ela")
-                return {"erro": "Sala não encontrada"}, 404
+            salaVerification(validado["sala_id"])
 
-            responsavel = db.session.get(TB_Responsavel, validado["responsavel_id"])
-            if not responsavel or not responsavel.ativo:
-                logger.info(f"Responsável não encontrado ou inativo, não será possivel cadastrar uma nova reserva para ele")
-                return {"erro": "Responsável inválido ou inativo"}, 400
-            
+            responsavelVerification(validado["responsavel_id"])
+
+            responsavelIsActive(validado["responsavel_id"])
+
             if existe_conflito_reserva_raw(
                 sala_id=validado["sala_id"],
                 hora_inicio=validado["hora_inicio"],
@@ -151,7 +89,9 @@ class TB_ReservasResource(Resource):
                 }, 409
 
             reserva = TB_Reserva(**validado)
+
             db.session.add(reserva)
+            
             db.session.flush()
 
             for dia in dias_semana:
@@ -186,9 +126,10 @@ class TB_ReservaResource(Resource):
         logger.info(f"GET - Reserva {reserva_id}")
 
         try:
-            cache_key = f"reservas:{reserva_id}"
-            logger.info(f"Verificando se há dados da reserva {reserva_id} no Redis")
-            cache = redis_client.get(cache_key)
+            cacheKey = f"reservas:{reserva_id}"
+
+            cache = verificarRedisCache("Reservas", cacheKey)
+
             if cache:
                 logger.info(f"Retornando reserva {reserva_id} do Redis!")                
                 return json.loads(cache), 200
@@ -201,15 +142,17 @@ class TB_ReservaResource(Resource):
         try:
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
+
             reserva = db.session.get(TB_Reserva, reserva_id)
-            if not reserva:
-                logger.info(f"Reserva {reserva_id} não encontrada")
-                return {"erro": "Reserva não encontrada"}, 404
+
+            reservaVerification(reserva_id)
 
             resposta = marshal(reserva, tb_reserva_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(resposta)
+
             logger.info(f"Reserva {reserva_id} retornado do Banco de Dados!")
+
             return resposta, 200
 
         except SQLAlchemyError:
@@ -226,11 +169,11 @@ class TB_ReservaResource(Resource):
         logger.info(f"PUT - Editando Reserva {reserva_id}")
 
         reserva = db.session.get(TB_Reserva, reserva_id)
-        if not reserva:
-            logger.info(f"Reserva não encontrada")
-            return {"erro": "Reserva não encontrada"}, 404
+
+        reservaVerification(reserva_id)
         
         dados = request.get_json()
+
         dias_payload = dados.pop("dias_semana", None)
 
         frequencia_final = dados.get("frequencia", reserva.frequencia)
@@ -245,6 +188,7 @@ class TB_ReservaResource(Resource):
 
         
         dados["frequencia"] = frequencia_final
+
         dados["dias_semana"] = dias_finais
 
 
@@ -271,6 +215,7 @@ class TB_ReservaResource(Resource):
                 }, 409
                 
             atualizados = dados_normalizados
+
             for campo, valor in atualizados.items():
                 setattr(reserva, campo, valor)
 
@@ -287,6 +232,7 @@ class TB_ReservaResource(Resource):
                 )
 
             db.session.commit()
+
             redis_client.delete_pattern("reservas:*")
 
             return marshal(reserva, tb_reserva_fields), 200
@@ -311,14 +257,13 @@ class TB_ReservaResource(Resource):
 
         try:
             reserva = db.session.get(TB_Reserva, reserva_id)
-            if not reserva:
-                logger.info(f"Reserva {reserva_id} não encontrada")
-                return {"erro": "Reserva não encontrada"}, 404
-            if reserva.status == "ativa":
-                logger.info(f"Reserva {reserva_id} está ativa, não pode ser apagada!")
-                return {"erro": "Não é possível apagar uma reserva que se encontra ativa"}, 409
+
+            reservaVerification(reserva_id)
+
+            reservaStatusIsAtiva(reserva_id)
             
             db.session.delete(reserva)
+
             db.session.commit()
 
             redis_client.delete_pattern("reservas:*")
