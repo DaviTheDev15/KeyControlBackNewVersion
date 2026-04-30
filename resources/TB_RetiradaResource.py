@@ -6,6 +6,8 @@ from sqlalchemy import text, and_
 from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
+from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva
 
 from models.TB_Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
 from models.TB_Chave import TB_Chave
@@ -22,16 +24,15 @@ class TB_RetiradasResource(Resource):
         logger.info("GET ALL - Listagem de Retiradas")
 
         try:
-            cache_key = "retiradas:*"
-            cache = redis_client.get(cache_key)
+            cacheKey = "retiradas:*"
 
-            logger.info("Verificando se há dados das Retiradas no Redis!")
+            cache = verificarRedisCache("Retiradas", cacheKey)
+
             if cache:
                 logger.info("Retornando Retiradas do Redis")
                 return json.loads(cache), 200
             
         except Exception:
-            logger.info("Erro ao acessar o Redis Cache")
             log_exception("Erro ao acessar Redis")
             abort(500, "Erro ao acessar cache")
 
@@ -45,20 +46,18 @@ class TB_RetiradasResource(Resource):
 
             resposta = marshal(retiradas, tb_retirada_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            redis_client.setex(cacheKey, 10, json.dumps(resposta))
 
             logger.info("Retornando Retiradas do Banco de Dados")
             return resposta, 200
         
         except SQLAlchemyError:
             log_exception("Erro SQLAlchemy ao buscar TB_Retiradas")
-            logger.info("Erro SQLAlchemy ao buscar TB_Retirads")
             db.session.rollback()
             abort(500, "Erro ao buscar TB_Retiradas no banco de dados")
 
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Retiradas")
-            logger.info("Erro inesperado ao buscar TB_Retiradas")
             abort(500, description="Erro interno inesperado.")
 
     def post(self):
@@ -69,30 +68,13 @@ class TB_RetiradasResource(Resource):
         try:
             validado = schema.load(dados)
             hoje = date.today()
-            agora = datetime.now().time()
-
-            if validado.get("data_retirada") != hoje:
-                logger.info("Não é possivel fazer retirada para um dia diferente de hoje")
-                return {"erro": "Data inválida"}, 404
-
-
-            if validado.get("reserva_id") in (0, "0"):
-                validado["reserva_id"] = None
-
-
-            reserva = None
 
             if validado.get("reserva_id") is not None:
+
                 reserva = db.session.get(TB_Reserva, validado["reserva_id"])
-                if not reserva:
-                    logger.info("Reserva não encontrada")
-                    return {"erro": "Reserva não encontrada"}, 404
-
-                if reserva.status != "ativa":
-                    logger.info("Reserva não está ativa")
-                    return {"erro": "Reserva não está ativa"}, 409
-
-
+                reservaVerification(validado["reserva_id"])
+                reservaStatusIsAtiva(validado["reserva_id"])
+                
                 if not (reserva.data_inicio <= hoje <= reserva.data_fim):
                     logger.info("Hoje não está dentro do período da reserva")
                     return {"erro": "Hoje não está dentro do período da reserva"}, 409

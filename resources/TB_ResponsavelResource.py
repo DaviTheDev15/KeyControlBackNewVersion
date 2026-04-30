@@ -24,7 +24,8 @@ class TB_ResponsaveisResource(Resource):
 
         text = request.args.get("q", "*")
 
-        solrVerification(text, page, per_page)
+        if text and text != "*":
+            return solrVerification(text, page, per_page)
 
         try:
             cacheKey = f"responsaveis:page={page}:per_page={per_page}"
@@ -36,8 +37,8 @@ class TB_ResponsaveisResource(Resource):
                 return json.loads(cache), 200
         
         except Exception:
-            log_exception("Erro ao acessar o Redis Cache")
-            abort(500, description="Erro ao acessar o Redis Cache")
+            log_exception("Erro ao retornar o Redis Cache")
+            abort(500, description="Erro ao retornar o Redis Cache")
 
 
         try:
@@ -97,13 +98,11 @@ class TB_ResponsaveisResource(Resource):
             return {"erro": "Dados inválidos", "detalhes": err.messages}, 422
 
         except SQLAlchemyError:
-            logger.info("Erro SQLAlchemy ao inserir Responsavel")
             log_exception("Erro SQLAlchemy ao inserir Responsavel")
             db.session.rollback()
             abort(500, "Erro ao inserir Responsavel.")
 
         except Exception:
-            logger.info("Erro inesperado ao inserir Responsavel")
             log_exception("Erro inesperado ao inserir Responsavel")
             abort(500, "Erro interno inesperado.")
 
@@ -121,8 +120,7 @@ class TB_ResponsavelResource(Resource):
                 return json.loads(cache), 200
         
         except Exception:
-            logger.info("Erro ao acessar o Redis Cache")
-            log_exception("Erro ao acessar o Redis Cache")
+            log_exception("Erro ao retornar o Redis Cache")
             abort(500, description="Erro ao acessar o Redis Cache")
             
         try:

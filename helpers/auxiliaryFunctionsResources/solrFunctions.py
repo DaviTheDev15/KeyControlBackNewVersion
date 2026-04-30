@@ -3,7 +3,6 @@ from helpers.logging import logger, log_exception
 from flask import abort
 
 def solrVerification(text, page, per_page):
-    if text and text != "*":
         try:
             logger.info(f"Buscando no Solr pelo termo: {text}")
             start = (page - 1) * per_page
