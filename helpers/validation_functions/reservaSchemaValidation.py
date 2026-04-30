@@ -1,6 +1,7 @@
 from marshmallow import ValidationError
 from helpers.validation_functions.genericValidations import montarDicionarioDeMensagemDeErro
 from datetime import date
+from flask import request
 
 def validateReservaRules(data):
     validarFrequencia(data)
@@ -39,8 +40,9 @@ def validarData(data):
     dias_semana = data.get("dias_semana", [])
     hoje = date.today()
 
-    if data_inicio < hoje:
-        raise ValidationError(montarDicionarioDeMensagemDeErro("data_inicio", "data_inicio"))
+    if request.method == "POST":
+        if data_inicio < hoje:
+            raise ValidationError(montarDicionarioDeMensagemDeErro("data_inicio", "data_inicio"))
     
     if data_fim < data_inicio:
         raise ValidationError(montarDicionarioDeMensagemDeErro("data_fim", "data_fim"))
