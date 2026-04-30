@@ -7,53 +7,35 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.solr import solr_client
+from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerification, adicionarResponsavel, deletarResponsavel
+from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import responsavelVerification, responsavelIsActive
 
 from models.TB_Responsavel import TB_Responsavel, TB_ResponsavelSchema, tb_responsavel_fields
 import json
-
 
 class TB_ResponsaveisResource(Resource):
     def get(self):
         logger.info("GET ALL - Listagem de Responsáveis")
 
         page = int(request.args.get("page", 1))
+
         per_page = int(request.args.get("per_page", 50))
+
         text = request.args.get("q", "*")
 
-        if text and text != "*":
-            try:
-                logger.info(f"Buscando no Solr pelo termo: {text}")
-                start = (page - 1) * per_page
-                
-                query_solr = (
-                    f"responsavel_nome:{text}~2 OR "
-                    f"responsavel_cpf:*{text}* OR "
-                    f"responsavel_siap:*{text}*"
-                )
-
-                results = solr_client.search(query_solr, **{
-                    'start': start,
-                    'rows': per_page
-                })
-                
-                return list(results), 200
-
-            except Exception as e:
-                logger.info("Erro ao buscar no Solr")
-                log_exception("Erro ao buscar no Solr")
+        solrVerification(text, page, per_page)
 
         try:
-            cache_key = f"responsaveis:page={page}:per_page={per_page}"
+            cacheKey = f"responsaveis:page={page}:per_page={per_page}"
 
-            logger.info("Verificando se há dados dos responsáveis no Redis!")
-            cache = redis_client.get(cache_key)
+            cache = verificarRedisCache("Responsaveis", cacheKey)
+
             if cache:
                 logger.info("Retornando responsáveis do Redis!")
                 return json.loads(cache), 200
         
-
         except Exception:
-            logger.info("Erro ao acessar o Redis Cache")
             log_exception("Erro ao acessar o Redis Cache")
             abort(500, description="Erro ao acessar o Redis Cache")
 
@@ -61,26 +43,28 @@ class TB_ResponsaveisResource(Resource):
         try:
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
+
             query = db.select(TB_Responsavel).order_by(TB_Responsavel.responsavel_id)
+
             responsaveis = db.session.execute(
                 query.offset((page - 1) * per_page).limit(per_page)
             ).scalars().all()
 
             resposta = marshal(responsaveis, tb_responsavel_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(cacheKey, resposta)
+
             logger.info("Retornando responsáveis do Banco de Dados!")
+
             return resposta, 200
         
         except SQLAlchemyError:
             log_exception("Erro SQLAlchemy ao buscar TB_Responsavel")
-            logger.info("Erro SQLAlchemy ao buscar TB_Responsavel")
             db.session.rollback()
             abort(500, description="Erro ao buscar TB_Responsavel no banco de dados.")
 
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Responsavel")
-            logger.info("Erro inesperado ao buscar TB_Responsavel")
             abort(500, description="Erro interno inesperado.")
 
         
@@ -88,41 +72,29 @@ class TB_ResponsaveisResource(Resource):
         logger.info("POST - Novo Responsável")
         
         schema = TB_ResponsavelSchema()
+
         dados = request.get_json()
 
         try:
             validado = schema.load(dados)
+
             novo_responsavel = TB_Responsavel(**validado)
 
             db.session.add(novo_responsavel)
+
             db.session.commit()
 
             resposta = marshal(novo_responsavel, tb_responsavel_fields)
 
-            try:
-                doc_solr = {
-                    "id": str(novo_responsavel.responsavel_id),
-                    "responsavel_id": novo_responsavel.responsavel_id,
-                    "responsavel_nome": novo_responsavel.responsavel_nome,
-                    "responsavel_cpf": novo_responsavel.responsavel_cpf,
-                    "responsavel_siap": novo_responsavel.responsavel_siap,
-                    "ativo": novo_responsavel.ativo,
-                    "responsavel_data_nascimento": str(novo_responsavel.responsavel_data_nascimento) if novo_responsavel.responsavel_data_nascimento else None
-                }
-                solr_client.add([doc_solr])
-                logger.info(f"Responsável {novo_responsavel.responsavel_id} indexado no Solr.")
-            except Exception:
-                log_exception(f"Falha ao indexar no Solr. Id: {novo_responsavel.responsavel_id}")
+            adicionarResponsavel(novo_responsavel)
 
             redis_client.delete_pattern("responsaveis:*")
 
             return resposta, 201
-        
 
         except ValidationError as err:
             logger.info(f"Dados inválidos, detalhes {err.messages}")
             return {"erro": "Dados inválidos", "detalhes": err.messages}, 422
-        
 
         except SQLAlchemyError:
             logger.info("Erro SQLAlchemy ao inserir Responsavel")
@@ -141,10 +113,9 @@ class TB_ResponsavelResource(Resource):
         logger.info(f"GET BY ID - Responsável ID {responsavel_id}")
 
         try:
-            cache_key = f"responsaveis:{responsavel_id}"
+            cacheKey = f"responsaveis:{responsavel_id}"
 
-            logger.info(f"Verificando se há dados do Responsavel {responsavel_id} no Redis!")
-            cache = redis_client.get(cache_key)
+            cache = verificarRedisCache("Responsavel", cacheKey)
             if cache:
                 logger.info(f"Retornando responsável {responsavel_id} do Redis!")
                 return json.loads(cache), 200
@@ -157,15 +128,17 @@ class TB_ResponsavelResource(Resource):
         try:
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
+
             responsavel = db.session.get(TB_Responsavel, responsavel_id)
-            if not responsavel:
-                logger.info(f"Responsável {responsavel_id} não encontrado")
-                return {"erro": "Responsável não encontrado"}, 404
+
+            responsavelVerification(responsavel_id)
 
             resposta = marshal(responsavel, tb_responsavel_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(cacheKey, resposta)
+
             logger.info(f"Responsável {responsavel_id} retornado do Banco de Dados!")
+
             return resposta, 200
 
         except SQLAlchemyError:
@@ -183,13 +156,13 @@ class TB_ResponsavelResource(Resource):
         logger.info(f"PUT - Editando Responsável {responsavel_id}")
 
         schema = TB_ResponsavelSchema()
+
         dados = request.get_json()
 
         try:
             responsavel = db.session.get(TB_Responsavel, responsavel_id)
-            if not responsavel:
-                logger.info(f"Responsável {responsavel_id} não encontrado")
-                return {"erro": "Responsável não encontrado"}, 404
+
+            responsavelVerification(responsavel_id)
 
             atualizados = schema.load(dados, partial=True)
 
@@ -198,20 +171,7 @@ class TB_ResponsavelResource(Resource):
 
             db.session.commit()
 
-            try:
-                doc_solr = {
-                    "id": str(responsavel.responsavel_id),
-                    "responsavel_id": responsavel.responsavel_id,
-                    "responsavel_nome": responsavel.responsavel_nome,
-                    "responsavel_cpf": responsavel.responsavel_cpf,
-                    "responsavel_siap": responsavel.responsavel_siap,
-                    "ativo": responsavel.ativo,
-                    "responsavel_data_nascimento": str(responsavel.responsavel_data_nascimento) if responsavel.responsavel_data_nascimento else None
-                }
-                solr_client.add([doc_solr])
-                logger.info(f"Responsável {responsavel_id} atualizado no Solr.")
-            except Exception:
-                log_exception(f"Falha ao atualizar Solr. Id: {responsavel_id}")
+            adicionarResponsavel(responsavel)
 
             redis_client.delete(f"responsaveis:*")
 
@@ -238,21 +198,16 @@ class TB_ResponsavelResource(Resource):
 
         try:
             responsavel = db.session.get(TB_Responsavel, responsavel_id)
-            if not responsavel:
-                logger.info(f"Responsável {responsavel_id} não encontrado")
-                return {"erro": "Responsável não encontrado"}, 404
-            if responsavel.ativo:
-                logger.info(f"Responsável {responsavel_id} se encontra ativo na instituição, não se pode apagar responsáveis ativos")
-                return {"erro":"Responsável se encontra ativo na instituição, não se pode apagar responsáveis ativos"}, 409
+
+            responsavelVerification(responsavel_id)
+
+            responsavelIsActive(responsavel_id)
 
             db.session.delete(responsavel)
+            
             db.session.commit()
 
-            try:
-                solr_client.delete(id=str(responsavel_id))
-                logger.info(f"Responsável {responsavel_id} removido do Solr.")
-            except Exception:
-                log_exception(f"Falha ao remover Solr. Id: {responsavel_id}")
+            deletarResponsavel(responsavel_id)
 
             redis_client.delete(f"responsaveis:*")
 
