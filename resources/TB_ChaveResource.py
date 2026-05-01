@@ -10,6 +10,7 @@ from helpers.redis_cache import redis_client
 from helpers.auxiliaryFunctionsResources.helpFunctionsForChavesResources import gerar_nome_da_chave
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import verificarRedisCache, preencherRedisCache
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification, chaveVerification
+from werkzeug.exceptions import HTTPException
 
 from models.TB_Chave import TB_Chave, TB_ChaveSchema, tb_chave_fields
 
@@ -52,6 +53,9 @@ class TB_ChavesResource(Resource):
             log_exception("Erro SQLAlchemy ao buscar TB_Chaves")
             db.session.rollback()
             abort(500, "Erro ao buscar TB_Chaves no banco de dados")
+
+        except HTTPException:
+            raise
 
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Chaves")
@@ -98,6 +102,9 @@ class TB_ChavesResource(Resource):
             log_exception("Erro SQLAlchemy ao inserir Chave")
             db.session.rollback()
             abort(500, "Erro ao inserir Chave.")
+      
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao inserir Chave")
@@ -142,6 +149,9 @@ class TB_ChaveResource(Resource):
             log_exception(f"Erro SQLAlchemy ao buscar a Chave {chave_id} no bando de dados")
             abort(500, "Erro ao buscar Chave no banco de dados")
 
+        except HTTPException:
+            raise
+
         except Exception:
             log_exception("Erro inesperado ao buscar Chave")
             abort(500, "Erro interno inesperado")
@@ -181,6 +191,9 @@ class TB_ChaveResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao atualizar Chave.") 
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info(f"Erro inesperado ao atualizar Chave {chave_id}")
             log_exception("Erro inesperado ao atualizar Chave")
@@ -211,6 +224,9 @@ class TB_ChaveResource(Resource):
             db.session.rollback()
             abort(500, "Erro SQLALchemy ao remover Chave.")
 
+        except HTTPException:
+            raise
+        
         except Exception:
             log_exception("Erro inesperado ao remover Chave")
             abort(500, "Erro interno inesperado ao remover Chave")                    

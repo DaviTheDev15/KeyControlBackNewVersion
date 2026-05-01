@@ -10,6 +10,9 @@ from helpers.solr import solr_client
 
 from models.TB_Sala import TB_Sala, TB_SalaSchema, tb_sala_fields
 from models.TB_Chave import TB_Chave
+
+from werkzeug.exceptions import HTTPException 
+
 import json
 
 class TB_SalasResource(Resource):
@@ -82,6 +85,9 @@ class TB_SalasResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao buscar TB_Salas no banco de dados.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Salas")
             logger.info("Erro inesperado ao buscar TB_Salas")
@@ -124,6 +130,8 @@ class TB_SalasResource(Resource):
             logger.info(f"Dados inválidos, detalhes {err.messages}")
             return {"erro": "Dados inválidos", "detalhes": err.messages}, 422
         
+        except HTTPException:
+            raise
 
         except SQLAlchemyError:
             logger.info("Erro SQLAlchemy ao inserir Sala")
@@ -172,6 +180,9 @@ class TB_SalaResource(Resource):
             logger.info(f"Erro SQLAlchemy ao buscar Sala {sala_id}")
             log_exception("Erro SQLAlchemy ao buscar Sala")
             abort(500, description="Erro ao buscar Sala no banco de dados.")
+
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao buscar Sala")
@@ -235,6 +246,9 @@ class TB_SalaResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao atualizar Sala.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info(f"Erro inesperado ao atualizar Sala {sala_id}")
             log_exception("Erro inesperado ao atualizar Sala")
@@ -263,6 +277,9 @@ class TB_SalaResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao remover Sala.")
         
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao remover Sala")
             log_exception("Erro inesperado ao remover Sala")

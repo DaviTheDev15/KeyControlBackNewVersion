@@ -10,6 +10,7 @@ from helpers.auxiliaryFunctionsResources.redisCacheFunctions import verificarRed
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification, responsavelIsActive, responsavelVerification, reservaVerification, reservaStatusIsAtiva
 from models.TB_Reserva import TB_Reserva, TB_ReservaSchema, tb_reserva_fields
 from models.TB_ReservaDia import TB_ReservaDia
+from werkzeug.exceptions import HTTPException   
 
 import json
 
@@ -50,6 +51,9 @@ class TB_ReservasResource(Resource):
             log_exception("Erro SQLAlchemy ao buscar TB_Reservas")
             db.session.rollback()
             abort(500, "Erro ao buscar TB_Reservas no banco de dados")
+
+        except HTTPException:
+            raise
 
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Reservas")
@@ -115,6 +119,9 @@ class TB_ReservasResource(Resource):
             db.session.rollback()
             abort(500, "Erro ao criar Reserva")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao inserir Reserva")
             log_exception("Erro inesperado ao inserir Reserva")
@@ -159,7 +166,10 @@ class TB_ReservaResource(Resource):
             logger.info(f"Erro SQLAlchemy ao buscar Reserva {reserva_id}")
             log_exception("Erro SQLAlchemy ao buscar Reserva")
             abort(500, description="Erro ao buscar Reserva no banco de dados")
-        
+
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao buscar Reserva")
             log_exception("Erro inesperado ao buscar Reserva")
@@ -247,6 +257,9 @@ class TB_ReservaResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao atualizar Reserva.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info(f"Erro inesperado ao atualizar Reserva {reserva_id}")
             log_exception("Erro inesperado ao atualizar Reserva")
@@ -275,6 +288,9 @@ class TB_ReservaResource(Resource):
             log_exception("Erro SQLAlchemy ao cancelar Reserva")
             db.session.rollback()
             abort(500, description="Erro ao remover Reserva.")
+
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao remover Reserva")

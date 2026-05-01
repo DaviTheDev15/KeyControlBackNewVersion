@@ -12,6 +12,7 @@ from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRed
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import responsavelVerification, responsavelIsActive
 
 from models.TB_Responsavel import TB_Responsavel, TB_ResponsavelSchema, tb_responsavel_fields
+from werkzeug.exceptions import HTTPException 
 import json
 
 class TB_ResponsaveisResource(Resource):
@@ -64,6 +65,9 @@ class TB_ResponsaveisResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao buscar TB_Responsavel no banco de dados.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Responsavel")
             abort(500, description="Erro interno inesperado.")
@@ -101,6 +105,9 @@ class TB_ResponsaveisResource(Resource):
             log_exception("Erro SQLAlchemy ao inserir Responsavel")
             db.session.rollback()
             abort(500, "Erro ao inserir Responsavel.")
+
+        except HTTPException:
+            raise
 
         except Exception:
             log_exception("Erro inesperado ao inserir Responsavel")
@@ -144,6 +151,9 @@ class TB_ResponsavelResource(Resource):
             log_exception("Erro SQLAlchemy ao buscar Responsável")
             abort(500, description="Erro ao buscar Responsável no banco de dados.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao buscar Responsavel")
             log_exception("Erro inesperado ao buscar Responsavel")
@@ -185,6 +195,9 @@ class TB_ResponsavelResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao atualizar Responsável.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao atualizar Responsável")
             log_exception("Erro inesperado ao atualizar Responsável")
@@ -216,6 +229,9 @@ class TB_ResponsavelResource(Resource):
             log_exception("Erro SQLAlchemy ao remover Responsável")
             db.session.rollback()
             abort(500, description="Erro ao remover Responsável.")
+
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao remover Responsavel")

@@ -15,6 +15,8 @@ from models.TB_Responsavel import TB_Responsavel
 from models.TB_Reserva import TB_Reserva
 from models.TB_Sala import TB_Sala
 
+from werkzeug.exceptions import HTTPException 
+
 import json
 from datetime import date, datetime, timedelta
 
@@ -55,6 +57,9 @@ class TB_RetiradasResource(Resource):
             log_exception("Erro SQLAlchemy ao buscar TB_Retiradas")
             db.session.rollback()
             abort(500, "Erro ao buscar TB_Retiradas no banco de dados")
+
+        except HTTPException:
+            raise
 
         except Exception:
             log_exception("Erro inesperado ao buscar TB_Retiradas")
@@ -159,6 +164,9 @@ class TB_RetiradasResource(Resource):
             db.session.rollback()
             abort(500, "Erro ao criar Retirada")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao inserir Retirada")
             log_exception("Erro inesperado ao inserir Retirada")
@@ -202,6 +210,9 @@ class TB_RetiradaResource(Resource):
             logger.info(f"Erro SQLAlchemy ao buscar Retirada {retirada_id}")
             log_exception("Erro SQLAlchemy ao buscar Retirada")
             abort(500, description="Erro ao buscar Retirada no banco de dados")
+
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao buscar Retirada")
@@ -267,6 +278,9 @@ class TB_RetiradaResource(Resource):
             db.session.rollback()
             abort(500, description="Erro ao atualizar Retirada.")
 
+        except HTTPException:
+            raise
+
         except Exception:
             logger.info("Erro inesperado ao atualizar Retirada")
             log_exception("Erro inesperado ao atualizar Retirada")
@@ -297,6 +311,9 @@ class TB_RetiradaResource(Resource):
             log_exception("Erro SQLAlchemy ao remover Retirada")
             db.session.rollback()
             abort(500, description="Erro ao remover Retirada.")
+
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao remover Retirada")
