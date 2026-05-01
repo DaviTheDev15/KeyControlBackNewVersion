@@ -41,9 +41,29 @@ def adicionarResponsavel(novo_responsavel):
     except Exception:
         log_exception(f"Falha ao indexar no Solr. Id: {novo_responsavel.responsavel_id}") 
 
+def adicionarSala(nova_sala):
+    try:
+        doc_solr = {
+            "id": f"sala_{nova_sala.sala_id}",
+            "sala_id": nova_sala.sala_id,
+            "sala_nome": nova_sala.sala_nome,
+            "disponivel": nova_sala.disponivel
+        }
+        solr_client.add([doc_solr])
+        logger.info(f"Sala {nova_sala.sala_id} indexado no Solr.")
+    except Exception:
+        log_exception(f"Falha ao indexar no Solr. Id: {nova_sala.sala_id}")
+
 def deletarResponsavel(responsavel_id):
     try:
         solr_client.delete(id=str(responsavel_id))
         logger.info(f"Responsável {responsavel_id} removido do Solr.")
     except Exception:
         log_exception(f"Falha ao remover Solr. Id: {responsavel_id}")
+
+def deletarSala(sala_id):
+    try:
+        solr_client.delete(id=str(sala_id))
+        logger.info(f"Sala {sala_id} removido do Solr.")
+    except Exception:
+        log_exception(f"Falha ao remover Solr. Id: {sala_id}")

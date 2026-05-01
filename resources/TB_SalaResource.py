@@ -7,6 +7,9 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.solr import solr_client
+from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerification, adicionarSala, deletarSala
+from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification
 
 from models.TB_Sala import TB_Sala, TB_SalaSchema, tb_sala_fields
 from models.TB_Chave import TB_Chave
@@ -20,44 +23,19 @@ class TB_SalasResource(Resource):
         logger.info("GET ALL - Listagem de Salas")
 
         page = int(request.args.get("page", 1))
+
         per_page = int(request.args.get("per_page", 50))
+
         text = request.args.get("q", "*")
 
         if text and text != "*":
-            try:
-                logger.info(f"Buscando no Solr pelo termo: {text}")
-                start = (page - 1) * per_page
-                
-                query_solr = (
-                    f"sala_nome:{text}*"
-                )
+            return solrVerification(text, page, per_page)
 
-                results = solr_client.search(query_solr, **{
-                    'start': start,
-                    'rows': per_page
-                })
-                
-                def normalizar_doc(doc):
-                    return {
-                        "id": doc.get("id"),
-                        "sala_id": doc.get("sala_id", [None])[0],
-                        "sala_nome": doc.get("sala_nome", [""])[0],
-                        "disponivel": doc.get("disponivel", [False])[0]
-                    }
-
-                dados = [normalizar_doc(doc) for doc in results]
-
-                return dados, 200
-
-            except Exception as e:
-                logger.info("Erro ao buscar no Solr")
-                log_exception("Erro ao buscar no Solr")
-        
         try:
-            cache_key = f"salas:page={page}:per_page={per_page}"
-            cache = redis_client.get(cache_key)
+            cacheKey = f"salas:page={page}:per_page={per_page}"
 
-            logger.info("Verificando se há dados das Salas no Redis!")
+            cache = verificarRedisCache("Salas", cacheKey)
+
             if cache:
                 logger.info("Retornando Salas do Redis!")
                 return json.loads(cache), 200
@@ -70,13 +48,17 @@ class TB_SalasResource(Resource):
         try:
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
+
             query = db.select(TB_Sala).order_by(TB_Sala.sala_id)
+
             salas = db.session.execute(query).scalars().all()
 
             resposta = marshal(salas, tb_sala_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(cacheKey, resposta)
+
             logger.info("Retornando Salas do Banco de Dados!")
+
             return resposta, 200
         
         except SQLAlchemyError:
@@ -98,46 +80,38 @@ class TB_SalasResource(Resource):
         logger.info("POST - Nova Sala")        
 
         schema = TB_SalaSchema()
+
         dados = request.get_json()
 
         try:
             validado = schema.load(dados)
+
             nova_sala = TB_Sala(**validado)
 
             db.session.add(nova_sala)
+
             db.session.commit()
 
             resposta = marshal(nova_sala, tb_sala_fields)
-            
-            try:
-                doc_solr = {
-                    "id": f"sala_{nova_sala.sala_id}",
-                    "sala_id": nova_sala.sala_id,
-                    "sala_nome": nova_sala.sala_nome,
-                    "disponivel": nova_sala.disponivel
-                }
-                solr_client.add([doc_solr])
-                logger.info(f"Sala {nova_sala.sala_id} indexado no Solr.")
-            except Exception:
-                log_exception(f"Falha ao indexar no Solr. Id: {nova_sala.sala_id}")
 
+            adicionarSala(nova_sala)
+            
             redis_client.delete_pattern("salas:*")
 
             return resposta, 201
-        
 
         except ValidationError as err:
             logger.info(f"Dados inválidos, detalhes {err.messages}")
             return {"erro": "Dados inválidos", "detalhes": err.messages}, 422
-        
-        except HTTPException:
-            raise
 
         except SQLAlchemyError:
             logger.info("Erro SQLAlchemy ao inserir Sala")
             log_exception("Erro SQLAlchemy ao inserir Sala")
             db.session.rollback()
             abort(500, "Erro ao inserir Sala.")
+            
+        except HTTPException:
+            raise
 
         except Exception:
             logger.info("Erro inesperado ao inserir Sala")
@@ -150,9 +124,9 @@ class TB_SalaResource(Resource):
         logger.info(f"GET BY ID - Sala {sala_id}")
 
         try:
-            cache_key = f"salas:{sala_id}"
-            logger.info(f"Verificando se há dados da sala {sala_id} no Redis!")
-            cache = redis_client.get(cache_key)
+            cacheKey = f"salas:{sala_id}"
+
+            cache = verificarRedisCache("Salas", cacheKey)
             if cache:
                 logger.info(f"Retornando sala {sala_id} do Redis!")
                 return json.loads(cache), 200
@@ -165,15 +139,17 @@ class TB_SalaResource(Resource):
         try:
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
+
             sala = db.session.get(TB_Sala, sala_id)
-            if not sala:
-                logger.info(f"Sala {sala_id} não encontrada")
-                return {"erro": "Sala não encontrada"}, 404
+
+            salaVerification(sala_id)
             
             resposta = marshal(sala, tb_sala_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(cacheKey, resposta)
+
             logger.info(f"Sala {sala_id} retornado do Banco de Dados!")
+
             return resposta, 200
         
         except SQLAlchemyError:
@@ -193,14 +169,13 @@ class TB_SalaResource(Resource):
         logger.info(f"PUT - Editando Sala {sala_id}")
 
         schema = TB_SalaSchema()
+
         dados = request.get_json()
 
         try:
             sala = db.session.get(TB_Sala, sala_id)
-            if not sala:
-                logger.info(f"Sala {sala_id} não encontrada")
-            
-                return {"erro":"Sala não encontrada"}, 404
+
+            salaVerification(sala_id)
 
             nomeAntigo = sala.sala_nome
 
@@ -220,17 +195,7 @@ class TB_SalaResource(Resource):
 
             db.session.commit()
 
-            try:
-                doc_solr = {
-                    "id": str(sala.sala_id),
-                    "sala_id": sala.sala_id,
-                    "sala_nome": sala.sala_nome,
-                    "disponivel": sala.disponivel
-                }
-                solr_client.add([doc_solr])
-                logger.info(f"Sala {sala_id} atualizado no Solr.")
-            except Exception:
-                log_exception(f"Falha ao atualizar no Solr. Id: {sala_id}")
+            adicionarSala(sala)
 
             redis_client.delete(f"salas:*")
 
@@ -260,12 +225,14 @@ class TB_SalaResource(Resource):
         
         try:
             sala = db.session.get(TB_Sala, sala_id)
-            if not sala:
-                logger.info(f"Sala {sala_id} não encontrada")
-                return {"erro":"Sala não encontrada"}, 404
+
+            salaVerification(sala_id)
             
             db.session.delete(sala)
+
             db.session.commit()
+
+            deletarSala(sala_id)
 
             redis_client.delete(f"salas:*")
 
