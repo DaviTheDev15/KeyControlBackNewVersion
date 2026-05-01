@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Date, Boolean
 from helpers.database import db
 from helpers.validation_functions.genericValidations import DateFormat, validate_positive, montarDicionarioDeMensagemDeErro
-from helpers.validation_functions.responsavelSchemaValidation import validar_unique_cpf, validar_unique_siap
+from helpers.validation_functions.responsavelSchemaValidation import validar_unique_cpf, validar_unique_siap, validarIdade
 from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
 
@@ -49,6 +49,7 @@ class TB_ResponsavelSchema(Schema):
     
     responsavel_data_nascimento = fields.Date(
         required=True,
+        validate=validarIdade,
         error_messages=montarDicionarioDeMensagemDeErro("responsavel_data_nascimento", ["required", "invalid"], "y"))
 
     ativo = fields.Boolean(
