@@ -7,7 +7,7 @@ from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.auxiliaryFunctionsResources.helpFunctionsForReservaResources import existe_conflito_reserva_raw, merge_reserva
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import verificarRedisCache, preencherRedisCache
-from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification, responsavelIsActive, responsavelVerification, reservaVerification, reservaStatusIsAtiva
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification, responsavelIsActive, responsavelVerification, reservaVerification, reservaStatusIsAtivaInDelete
 from models.TB_Reserva import TB_Reserva, TB_ReservaSchema, tb_reserva_fields
 from models.TB_ReservaDia import TB_ReservaDia
 from werkzeug.exceptions import HTTPException   
@@ -76,8 +76,6 @@ class TB_ReservasResource(Resource):
             salaVerification(validado["sala_id"])
 
             responsavelVerification(validado["responsavel_id"])
-
-            responsavelIsActive(validado["responsavel_id"])
 
             if existe_conflito_reserva_raw(
                 sala_id=validado["sala_id"],
@@ -273,7 +271,7 @@ class TB_ReservaResource(Resource):
 
             reservaVerification(reserva_id)
 
-            reservaStatusIsAtiva(reserva_id)
+            reservaStatusIsAtivaInDelete(reserva_id)
             
             db.session.delete(reserva)
 

@@ -7,7 +7,7 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
-from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva, chaveVerification, chaveIsDisponivel, responsavelIsActive, responsavelVerification, retiradaVerification, retiradaStatus
 
 from models.TB_Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
 from models.TB_Chave import TB_Chave
@@ -48,7 +48,7 @@ class TB_RetiradasResource(Resource):
 
             resposta = marshal(retiradas, tb_retirada_fields)
 
-            redis_client.setex(cacheKey, 10, json.dumps(resposta))
+            preencherRedisCache(cacheKey, resposta)
 
             logger.info("Retornando Retiradas do Banco de Dados")
             return resposta, 200
@@ -105,9 +105,8 @@ class TB_RetiradasResource(Resource):
                 
 
             chave = db.session.get(TB_Chave, validado["chave_id"])
-            if not chave:
-                logger.info("Chave não encontrada")
-                return {"erro": "Chave não encontrada"}, 404
+
+            chaveVerification(validado["chave_id"])
 
             sala = db.session.get(TB_Sala, chave.sala_id)
 
@@ -116,11 +115,7 @@ class TB_RetiradasResource(Resource):
                     "erro": "Reserva não pertence à sala da chave informada"
                 }, 409
 
-            if not chave.disponivel:
-                logger.info("Chave ou sala indisponível")
-                return {
-                    "erro": "Chave e a Sala à qual ela pertence não estão disponíveis no momento"
-                }, 409
+            chaveIsDisponivel(validado["chave_id"])
 
             retirada_ativa = (
                 db.session.query(TB_Retirada)
@@ -136,10 +131,8 @@ class TB_RetiradasResource(Resource):
                 logger.info("Já existe uma retirada ativa para esta sala")
                 return {"erro": "Já existe uma retirada ativa para esta sala"}, 409
 
-            responsavel = db.session.get(TB_Responsavel, validado["responsavel_id"])
-            if not responsavel or not responsavel.ativo:
-                logger.info("Responsável inválido ou inativo")
-                return {"erro": "Responsável inválido ou inativo"}, 400
+            responsavelVerification(validado["responsavel_id"])
+            responsavelIsActive(validado["responsavel_id"])
 
             retirada = TB_Retirada(**validado)
             db.session.add(retirada)
@@ -178,9 +171,10 @@ class TB_RetiradaResource(Resource):
         logger.info(f"GET - Retirada {retirada_id}")
 
         try:
-            cache_key = f"retiradas:{retirada_id}"
+            cacheKey = f"retiradas:{retirada_id}"
             logger.info(f"Verificando se há dados da retirada {retirada_id} no Redis")
-            cache = redis_client.get(cache_key)
+            cache = verificarRedisCache("Retiradas", cacheKey)
+            
             if cache:
                 logger.info(f"Retornando retirada {retirada_id} do Redis!")
                 return json.loads(cache), 200
@@ -195,13 +189,11 @@ class TB_RetiradaResource(Resource):
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
             retirada = db.session.get(TB_Retirada, retirada_id)
-            if not retirada:
-                logger.info(f"Retirada {retirada_id} não encontrada")
-                return {"erro": "Retirada não encontrada"}, 404
+            retiradaVerification(retirada_id)
 
             resposta = marshal(retirada, tb_retirada_fields)
 
-            redis_client.setex(cache_key, 10, json.dumps(resposta))
+            preencherRedisCache(cacheKey, resposta)
 
             logger.info(f"Retirada {retirada_id} retornada do Banco de Dados!")
             return resposta, 200
@@ -227,9 +219,7 @@ class TB_RetiradaResource(Resource):
 
         try:
             retirada = db.session.get(TB_Retirada, retirada_id)
-            if not retirada:
-                logger.info(f"Retirada {retirada_id} não encontrada")
-                return {"erro": "Retirada não encontrada"}, 404
+            retiradaVerification(retirada_id)
             
             status_anterior = retirada.status
             
@@ -291,12 +281,8 @@ class TB_RetiradaResource(Resource):
 
         try:
             retirada = db.session.get(TB_Retirada, retirada_id)
-            if not retirada:
-                logger.info(f"Retirada {retirada_id} não encontrada")
-                return {"erro":"Retirada não encontrada"}, 404
-            if retirada.status == "retirada" or retirada.status == "atrasada":
-                logger.info(f"A retirada {retirada_id}ainda não foi finalizada, por isso não poderá ser deletada")
-                return {"erro":"Retirada ainda não foi finalizada, por isso não poderá ser deletada"}, 409
+            retiradaVerification(retirada_id)
+            retiradaStatus(retirada_id)
             
             db.session.delete(retirada)
             db.session.commit()
