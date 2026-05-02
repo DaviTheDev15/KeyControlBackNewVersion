@@ -7,7 +7,7 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.solr import solr_client
-from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerification, adicionarSala, deletarSala
+from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerificationSala, adicionarSala, deletarSala
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import salaVerification
 
@@ -29,7 +29,7 @@ class TB_SalasResource(Resource):
         text = request.args.get("q", "*")
 
         if text and text != "*":
-            return solrVerification(text, page, per_page)
+            return solrVerificationSala(text, page, per_page)
 
         try:
             cacheKey = f"salas:page={page}:per_page={per_page}"

@@ -7,7 +7,7 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.solr import solr_client
-from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerification, adicionarResponsavel, deletarResponsavel
+from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerificationResponsavel, adicionarResponsavel, deletarResponsavel
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import responsavelVerification, responsavelIsActive
 
@@ -26,7 +26,7 @@ class TB_ResponsaveisResource(Resource):
         text = request.args.get("q", "*")
 
         if text and text != "*":
-            return solrVerification(text, page, per_page)
+            return solrVerificationResponsavel(text, page, per_page)
 
         try:
             cacheKey = f"responsaveis:page={page}:per_page={per_page}"

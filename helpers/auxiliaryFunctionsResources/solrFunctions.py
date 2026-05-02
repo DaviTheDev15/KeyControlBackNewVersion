@@ -2,25 +2,40 @@ from helpers.solr import solr_client
 from helpers.logging import logger, log_exception
 from flask import abort
 
-def solrVerification(text, page, per_page):
-        try:
-            logger.info(f"Buscando no Solr pelo termo: {text}")
-            start = (page - 1) * per_page
-            
-            query_solr = (
-                f"responsavel_nome:{text}~2 OR "
-                f"responsavel_cpf:*{text}* OR "
-                f"responsavel_siap:*{text}*"
-            )
+def solrVerificationResponsavel(text, page, per_page):
+    try:
+        logger.info(f"Buscando no Solr pelo termo: {text}")
+        start = (page - 1) * per_page
+        
+        query_solr = (
+            f"responsavel_nome:{text}~2 OR "
+            f"responsavel_cpf:*{text}* OR "
+            f"responsavel_siap:*{text}*"
+        )
 
-            results = solr_client.search(query_solr, **{
-                'start': start,
-                'rows': per_page
-            })
-            
-            return list(results), 200
+        results = solr_client.search(query_solr, **{
+            'start': start,
+            'rows': per_page
+        })
+        
+        return list(results), 200
 
-        except Exception as e:
+    except Exception as e:
+            logger.info("Erro ao buscar no Solr")
+            log_exception("Erro ao buscar no Solr")
+            abort(500, "Erro ao Buscar no Solr")
+
+def solrVerificationSala(text, page, per_page):
+    try:
+        start = (page - 1) * per_page
+
+        query_solr = f"sala_nome:{text}*"
+
+        results = solr_client.search(query_solr, start=start, rows=per_page)
+
+        return list(results), 200
+    
+    except Exception as e:
             logger.info("Erro ao buscar no Solr")
             log_exception("Erro ao buscar no Solr")
             abort(500, "Erro ao Buscar no Solr")
