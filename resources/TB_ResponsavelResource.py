@@ -19,17 +19,13 @@ class TB_ResponsaveisResource(Resource):
     def get(self):
         logger.info("GET ALL - Listagem de Responsáveis")
 
-        page = int(request.args.get("page", 1))
-
-        per_page = int(request.args.get("per_page", 50))
-
         text = request.args.get("q", "*")
 
         if text and text != "*":
-            return solrVerificationResponsavel(text, page, per_page)
+            return solrVerificationResponsavel(text)
 
         try:
-            cacheKey = f"responsaveis:page={page}:per_page={per_page}"
+            cacheKey = f"responsaveis:*"
 
             cache = verificarRedisCache("Responsaveis", cacheKey)
 
@@ -48,9 +44,7 @@ class TB_ResponsaveisResource(Resource):
 
             query = db.select(TB_Responsavel).order_by(TB_Responsavel.responsavel_id)
 
-            responsaveis = db.session.execute(
-                query.offset((page - 1) * per_page).limit(per_page)
-            ).scalars().all()
+            responsaveis = db.session.execute(query).scalars().all()
 
             resposta = marshal(responsaveis, tb_responsavel_fields)
 

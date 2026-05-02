@@ -2,21 +2,13 @@ from helpers.solr import solr_client
 from helpers.logging import logger, log_exception
 from flask import abort
 
-def solrVerificationResponsavel(text, page, per_page):
+def solrVerificationResponsavel(text):
     try:
         logger.info(f"Buscando no Solr pelo termo: {text}")
-        start = (page - 1) * per_page
         
-        query_solr = (
-            f"responsavel_nome:{text}~2 OR "
-            f"responsavel_cpf:*{text}* OR "
-            f"responsavel_siap:*{text}*"
-        )
+        query_solr = f"responsavel_nome:{text}*"
 
-        results = solr_client.search(query_solr, **{
-            'start': start,
-            'rows': per_page
-        })
+        results = solr_client.search(query_solr)
         
         return list(results), 200
 
@@ -25,13 +17,13 @@ def solrVerificationResponsavel(text, page, per_page):
             log_exception("Erro ao buscar no Solr")
             abort(500, "Erro ao Buscar no Solr")
 
-def solrVerificationSala(text, page, per_page):
+def solrVerificationSala(text):
     try:
-        start = (page - 1) * per_page
+        logger.info(f"Buscando no Solr pelo termo: {text}")
 
         query_solr = f"sala_nome:{text}*"
 
-        results = solr_client.search(query_solr, start=start, rows=per_page)
+        results = solr_client.search(query_solr)
 
         return list(results), 200
     

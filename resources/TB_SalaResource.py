@@ -22,17 +22,13 @@ class TB_SalasResource(Resource):
     def get(self):
         logger.info("GET ALL - Listagem de Salas")
 
-        page = int(request.args.get("page", 1))
-
-        per_page = int(request.args.get("per_page", 50))
-
         text = request.args.get("q", "*")
 
         if text and text != "*":
-            return solrVerificationSala(text, page, per_page)
+            return solrVerificationSala(text)
 
         try:
-            cacheKey = f"salas:page={page}:per_page={per_page}"
+            cacheKey = f"salas:*"
 
             cache = verificarRedisCache("Salas", cacheKey)
 
