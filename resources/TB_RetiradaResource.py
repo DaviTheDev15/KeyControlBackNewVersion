@@ -92,16 +92,16 @@ class TB_RetiradasResource(Resource):
                         logger.info("Hoje não é um dia permitido pela reserva")
                         return {"erro": "Hoje não é um dia permitido pela reserva"}, 409
                     
-                    hora_retirada = validado["hora_retirada"]
+                hora_retirada = validado["hora_retirada"]
 
-                    hora_minima = (
+                hora_minima = (
                         datetime.combine(hoje, reserva.hora_inicio) - timedelta(minutes=10)
                     ).time()
 
-                    if not (hora_minima <= hora_retirada <= reserva.hora_fim):
-                        return {
-                            "erro": "Retirada fora do intervalo permitido da reserva"
-                        }, 409
+                if not (hora_minima <= hora_retirada <= reserva.hora_fim):
+                    return {
+                        "erro": "Retirada fora do intervalo permitido da reserva"
+                    }, 409
                 
 
             chave = db.session.get(TB_Chave, validado["chave_id"])
