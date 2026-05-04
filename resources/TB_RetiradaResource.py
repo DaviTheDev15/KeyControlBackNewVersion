@@ -103,17 +103,17 @@ class TB_RetiradasResource(Resource):
                         "erro": "Retirada fora do intervalo permitido da reserva"
                     }, 409
                 
+                if reserva.sala_id != chave.sala_id:
+                    return {
+                        "erro": "Reserva não pertence à sala da chave informada"
+                    }, 409
+                
 
             chave = db.session.get(TB_Chave, validado["chave_id"])
 
             chaveVerification(validado["chave_id"])
 
             sala = db.session.get(TB_Sala, chave.sala_id)
-
-            if reserva and reserva.sala_id != chave.sala_id:
-                return {
-                    "erro": "Reserva não pertence à sala da chave informada"
-                }, 409
 
             chaveIsDisponivel(validado["chave_id"])
 
