@@ -74,6 +74,14 @@ class TB_RetiradasResource(Resource):
             validado = schema.load(dados)
             hoje = date.today()
 
+            chave = db.session.get(TB_Chave, validado["chave_id"])
+
+            chaveVerification(validado["chave_id"])
+
+            sala = db.session.get(TB_Sala, chave.sala_id)
+
+            chaveIsDisponivel(validado["chave_id"])
+
             if validado.get("reserva_id") is not None:
 
                 reserva = db.session.get(TB_Reserva, validado["reserva_id"])
@@ -107,15 +115,6 @@ class TB_RetiradasResource(Resource):
                     return {
                         "erro": "Reserva não pertence à sala da chave informada"
                     }, 409
-                
-
-            chave = db.session.get(TB_Chave, validado["chave_id"])
-
-            chaveVerification(validado["chave_id"])
-
-            sala = db.session.get(TB_Sala, chave.sala_id)
-
-            chaveIsDisponivel(validado["chave_id"])
 
             retirada_ativa = (
                 db.session.query(TB_Retirada)
