@@ -45,7 +45,7 @@ def sqlRequisicaoGetAll():
             sql += " AND LOWER(resp.responsavel_nome) LIKE :responsavel_nome"
             params["responsavel_nome"] = f"%{request.args.get('responsavel_nome').lower()}%"
 
-        sql += " ORDER BY r.data_retirada DESC, r.hora_retirada DESC"
+        sql = aplicar_ordenacao_historico(sql)
 
         resultado = db.session.execute(text(sql), params).mappings().all()
 

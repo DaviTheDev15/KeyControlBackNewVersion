@@ -16,8 +16,8 @@ def aplicar_ordenacao(query, campos, padrao):
 
 
 def aplicar_ordenacao_historico(sql):
-    sort = request.args.get("sort", "data_retirada")
-    order = request.args.get("order", "desc")
+    sort = request.args.get("sort", "id")
+    order = request.args.get("order", "asc")
 
     campos = {
         "id": "r.retirada_id",
@@ -27,7 +27,7 @@ def aplicar_ordenacao_historico(sql):
         "chave": "c.chave_nome"
     }
 
-    coluna = campos.get(sort, campos["data_retirada"])
+    coluna = campos.get(sort, campos["id"])
 
     if order.lower() == "asc":
         sql += f" ORDER BY {coluna} ASC"
