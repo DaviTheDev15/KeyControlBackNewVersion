@@ -3,6 +3,8 @@ from flask_restful import Resource, marshal
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
+from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
+
 from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
@@ -45,7 +47,9 @@ class TB_SalasResource(Resource):
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
 
-            query = db.select(TB_Sala).order_by(TB_Sala.sala_id)
+            query = db.select(TB_Sala)
+
+            query = aplicar_ordenacao(query, {"id": TB_Sala.sala_id, "nome":TB_Sala.sala_nome, "disponivel":TB_Chave.disponivel}, "id")
 
             salas = db.session.execute(query).scalars().all()
 
