@@ -8,6 +8,7 @@ from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva, chaveVerification, chaveIsDisponivel, responsavelIsActive, responsavelVerification, retiradaVerification, retiradaStatus
+from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 
 from models.TB_Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
 from models.TB_Chave import TB_Chave
@@ -42,7 +43,9 @@ class TB_RetiradasResource(Resource):
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
 
-            query = db.select(TB_Retirada).order_by(TB_Retirada.retirada_id)
+            query = db.select(TB_Retirada)
+            query = aplicar_ordenacao(query, {"id":TB_Retirada.retirada_id, "chave":TB_Retirada.chave_id, "responsavel":TB_Retirada.responsavel_id, "reserva":TB_Retirada.reserva_id, "data":TB_Retirada.data_retirada,"status":TB_Retirada.status}, "id")
+
 
             retiradas = db.session.execute(query).scalars().all()
 
