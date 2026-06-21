@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import func
 
+from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
@@ -37,8 +38,10 @@ class TB_ChavesResource(Resource):
             logger.info("Redis Cache vazio!")
             logger.info("Buscando Chaves no Banco de Dados")
 
-            query = db.select(TB_Chave).order_by(TB_Chave.chave_id)
-
+            query = db.select(TB_Chave)
+            
+            query = aplicar_ordenacao(query, {"id":TB_Chave.chave_id, "nome":TB_Chave.chave_nome, "disponivel":TB_Chave.disponivel}, "id")
+            
             chaves = db.session.execute(query).scalars().all()
 
             resposta = marshal(chaves, tb_chave_fields)

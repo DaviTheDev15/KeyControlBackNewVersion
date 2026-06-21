@@ -42,8 +42,7 @@ class TB_ResponsaveisResource(Resource):
         try:
             logger.info("Redis Cache estava vazio!")
             logger.info("Buscando no Banco de Dados!")
-
-            # query = db.select(TB_Responsavel).order_by(TB_Responsavel.responsavel_id)
+            
             query = db.select(TB_Responsavel)
 
             query = aplicar_ordenacao(query, {"id": TB_Responsavel.responsavel_id, "nome":TB_Responsavel.responsavel_nome, "ativo":TB_Responsavel.ativo}, "id")
