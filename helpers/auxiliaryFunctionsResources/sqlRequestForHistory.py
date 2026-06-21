@@ -3,7 +3,7 @@ from helpers.logging import logger, log_exception
 from flask import request, abort
 from helpers.database import db
 from sqlalchemy import text
-from helpFunctionsForSql import aplicar_ordenacao_historico, aplicar_filtros_historico
+from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao_historico, aplicar_filtros_historico
 
 def sqlRequisicaoGetAll():
     try:
@@ -24,25 +24,30 @@ def sqlRequisicaoGetAll():
 
                 resp.responsavel_id,
                 resp.responsavel_nome
-
             FROM tb_retirada r
             JOIN tb_chave c ON c.chave_id = r.chave_id
             JOIN tb_sala s ON s.sala_id = c.sala_id
             JOIN tb_responsavel resp ON resp.responsavel_id = r.responsavel_id
-
             WHERE r.status = 'devolvida'
-        """
+            """
 
         params = {}
 
-        sql, params = aplicar_filtros_historico(sql, params)
+        if request.args.get("sala_id"):
+            sql += " AND s.sala_id = :sala_id"
+            params["sala_id"] = request.args.get("sala_id")
 
-        sql = aplicar_ordenacao_historico(sql)
+        if request.args.get("responsavel_id"):
+            sql += " AND resp.responsavel_id = :responsavel_id"
+            params["responsavel_id"] = request.args.get("responsavel_id")
 
-        resultado = db.session.execute(
-            text(sql),
-            params
-        ).mappings().all()
+        if request.args.get("responsavel_nome"):
+            sql += " AND LOWER(resp.responsavel_nome) LIKE :responsavel_nome"
+            params["responsavel_nome"] = f"%{request.args.get('responsavel_nome').lower()}%"
+
+        sql += " ORDER BY r.data_retirada DESC, r.hora_retirada DESC"
+
+        resultado = db.session.execute(text(sql), params).mappings().all()
 
         resultado = [
             {
