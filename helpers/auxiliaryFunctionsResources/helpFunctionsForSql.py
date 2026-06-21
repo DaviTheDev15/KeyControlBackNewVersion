@@ -1,7 +1,7 @@
 from flask import request
 
 def aplicar_ordenacao(query, campos, padrao):
-    sort = request.args.get("sort", padrao)
+    sort = request.args.get("sort", "id")
     order = request.args.get("order", "asc")
 
     if order.lower() not in ("asc", "desc"):
@@ -20,8 +20,8 @@ def aplicar_ordenacao_historico(sql):
     order = request.args.get("order", "desc")
 
     campos = {
-        "data_retirada": "r.data_retirada",
-        "hora_retirada": "r.hora_retirada",
+        "id": "r.retirada_id",
+        "data": "r.data_retirada",
         "sala": "s.sala_nome",
         "responsavel": "resp.responsavel_nome",
         "chave": "c.chave_nome"
