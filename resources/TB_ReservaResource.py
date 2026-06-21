@@ -11,6 +11,7 @@ from helpers.auxiliaryFunctionsResources.genericValidationsForResource import sa
 from models.TB_Reserva import TB_Reserva, TB_ReservaSchema, tb_reserva_fields
 from models.TB_ReservaDia import TB_ReservaDia
 from werkzeug.exceptions import HTTPException   
+from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 
 import json
 
@@ -35,7 +36,9 @@ class TB_ReservasResource(Resource):
             logger.info("Redis Cache vazio!")
             logger.info("Buscando Reservas no Banco de Dados!")
 
-            query = db.select(TB_Reserva).order_by(TB_Reserva.reserva_id)
+            query = db.select(TB_Reserva)
+
+            query = aplicar_ordenacao(query, {"id": TB_Reserva.reserva_id, "sala":TB_Reserva.sala_id, "responsavel":TB_Reserva.responsavel_id, "data":TB_Reserva.data_inicio, "frequencia":TB_Reserva.frequencia, "status":TB_Reserva.status}, "id")
 
             reservas = db.session.execute(query).scalars().all()
 
