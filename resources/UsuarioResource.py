@@ -12,10 +12,13 @@ class UsuarioResource(Resource):
 
         data = schema.load(request.json)
 
+        primeiro_usuario = TB_Usuario.query.first() is None
+        funcao = "admin" if primeiro_usuario else "responsavel"
+
         usuario = TB_Usuario(
             usuario_nome=data["usuario_nome"],
             email=data["email"],
-            funcao=data["funcao"]
+            funcao=funcao
         )
 
         usuario.set_senha(data["senha"])

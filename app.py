@@ -9,9 +9,11 @@ from resources.TB_ChaveResource import TB_ChavesResource, TB_ChaveResource
 from resources.TB_ReservaResource import TB_ReservasResource, TB_ReservaResource
 from resources.TB_RetiradaResource import TB_RetiradasResource, TB_RetiradaResource
 from resources.HistoricoResource import HistoricoResource, HistoricoByIdResource
+
 from resources.UsuarioResource import UsuarioResource
 from resources.AuthResource import AuthResource
-
+from resources.MeResource import MeResource
+from resources.LogoutResource import LogoutResource
 
 cors.init_app(app)
 api.add_resource(IndexResource, '/')
@@ -27,8 +29,11 @@ api.add_resource(TB_RetiradasResource, '/retiradas')
 api.add_resource(TB_RetiradaResource, '/retiradas/<int:retirada_id>')
 api.add_resource(HistoricoResource, '/historico')
 api.add_resource(HistoricoByIdResource, '/historico/<int:retirada_id>')
+
 api.add_resource(UsuarioResource, "/usuario")
 api.add_resource(AuthResource, "/login")
+api.add_resource(MeResource, "/me")
+api.add_resource(LogoutResource, "/logout")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

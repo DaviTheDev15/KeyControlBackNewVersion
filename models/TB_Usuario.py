@@ -46,10 +46,8 @@ class TB_UsuarioSchema(Schema):
         error_messages=montarDicionarioDeMensagemDeErro("email", ["required", "invalid"]))
     senha = fields.Str(
         required=True,
+        load_only=True,
         validate=validate.Length(min=8, max=255, error="O campo senha deve ter entre 8 a 255 caracteres"),
         error_messages=montarDicionarioDeMensagemDeErro("senha", ["required", "null"]))
-    funcao = fields.Str(
-        required=True,
-        validate=validate.Length(min=3, max=255, error="O campo funcao deve ter entre 2 a 255 caracteres."),
-        error_messages=montarDicionarioDeMensagemDeErro("funcao", ["required", "null"]))
+    funcao = fields.Str(dump_only=True)
 
