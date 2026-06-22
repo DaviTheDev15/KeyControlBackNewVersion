@@ -49,7 +49,7 @@ class TB_SalasResource(Resource):
 
             query = db.select(TB_Sala)
 
-            query = aplicar_ordenacao(query, {"id": TB_Sala.sala_id, "nome":TB_Sala.sala_nome, "disponivel":TB_Chave.disponivel}, "id")
+            query = aplicar_ordenacao(query, {"id": TB_Sala.sala_id, "nome":TB_Sala.sala_nome, "disponivel":TB_Sala.disponivel}, "id")
 
             salas = db.session.execute(query).scalars().all()
 
