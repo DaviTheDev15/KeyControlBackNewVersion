@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request, make_response, jsonify
-from models.TB_Usuario import TB_Usuario
+from models.TB_Responsavel import TB_Responsavel
 from flask_jwt_extended import create_access_token, set_access_cookies
 
 class AuthResource(Resource):
@@ -17,22 +17,22 @@ class AuthResource(Resource):
         if not email or not senha:
             return {"message": "Email e senha são obrigatórios"}, 400
  
-        usuario = TB_Usuario.query.filter_by(email=email).first()
+        usuario = TB_Responsavel.query.filter_by(email=email).first()
  
         if not usuario or not usuario.check_senha(senha):
             return {"message": "Credenciais inválidas"}, 401
         
         access_token = create_access_token(
-            identity=str(usuario.usuario_id),
+            identity=str(usuario.responsavel_id),
             additional_claims={
                 "funcao": usuario.funcao,
-                "nome": usuario.usuario_nome,
+                "nome": usuario.responsavel_nome,
             }
         )
         
         response = make_response(
             jsonify({
-                "usuario": usuario.usuario_nome,
+                "usuario": usuario.responsavel_nome,
                 "funcao": usuario.funcao,
             }),
             200

@@ -80,7 +80,13 @@ class TB_ResponsaveisResource(Resource):
         try:
             validado = schema.load(dados)
 
-            novo_responsavel = TB_Responsavel(**validado)
+            senha_plain = validado.pop("senha")
+            
+            primeiro_responsavel = db.session.query(TB_Responsavel).first() is None
+            funcao = "admin" if primeiro_responsavel else "responsavel"
+           
+            novo_responsavel = TB_Responsavel(**validado, funcao=funcao)
+            novo_responsavel.set_senha(senha_plain)
 
             db.session.add(novo_responsavel)
 
