@@ -15,12 +15,15 @@ tb_responsavel_fields = {
     'responsavel_id': flaskFields.Integer,
     'responsavel_nome': flaskFields.String,
     'responsavel_siap': flaskFields.String,
+    'responsavel_matricula': flaskFields.String,
     'responsavel_cpf': flaskFields.String,
     'responsavel_data_nascimento': DateFormat,
     'email': flaskFields.String,
     'funcao': flaskFields.String,
     'ativo': flaskFields.Boolean
 }
+
+202313810011
     
 class TB_Responsavel(db.Model):
     __tablename__ = "tb_responsavel"
@@ -28,6 +31,7 @@ class TB_Responsavel(db.Model):
     responsavel_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     responsavel_nome: Mapped[str] = mapped_column(String(255), nullable=False)
     responsavel_siap: Mapped[str] = mapped_column(String(7), nullable=True, unique=True)
+    responsavel_matricula: Mapped[str] = mapped_column(String(12), nullable=True)
     responsavel_cpf: Mapped[str] = mapped_column(String(14), nullable=False, unique=True)
     responsavel_data_nascimento: Mapped[Date] = mapped_column(Date, nullable=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
@@ -61,6 +65,12 @@ class TB_ResponsavelSchema(Schema):
         required=False,  
         validate=validate.Length(equal=7, error="O campo responsavel_siap deve ter exatemente 7 caracteres."),
         error_messages=montarDicionarioDeMensagemDeErro("responsavel_siap", "null"))
+    
+    responsavel_matricula = fields.Str(
+        required=False,
+        validate=validate.Length(equal=12, error="O campo responsavel_matricula deve ter exatamente 12 caracteres."),
+        error_messages=montarDicionarioDeMensagemDeErro("responsavel_matricula", "null")
+    )
     
     responsavel_cpf = fields.Str(
         required=True,                         
