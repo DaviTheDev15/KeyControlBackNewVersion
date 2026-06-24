@@ -74,7 +74,7 @@ class TB_ResponsavelSchema(Schema):
     
     responsavel_cpf = fields.Str(
         required=True,                         
-        validate=validate.Length(min=11, max=14, error="O campo responsavel_cpf deve ter entre 11 a 14 caracteres."),
+        validate=validate.Length(equal=14, error="O campo responsavel_cpf deve ter exatamente 14 caracteres."),
         error_messages=montarDicionarioDeMensagemDeErro("responsavel_cpf", ["required","null"]))
     
     responsavel_data_nascimento = fields.Date(

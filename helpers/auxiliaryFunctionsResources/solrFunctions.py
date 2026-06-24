@@ -38,10 +38,13 @@ def adicionarResponsavel(novo_responsavel):
             "id": str(novo_responsavel.responsavel_id),
             "responsavel_id": novo_responsavel.responsavel_id,
             "responsavel_nome": novo_responsavel.responsavel_nome,
-            "responsavel_cpf": novo_responsavel.responsavel_cpf,
             "responsavel_siap": novo_responsavel.responsavel_siap,
-            "ativo": novo_responsavel.ativo,
-            "responsavel_data_nascimento": str(novo_responsavel.responsavel_data_nascimento) if novo_responsavel.responsavel_data_nascimento else None
+            "responsavel_matricula": novo_responsavel.responsavel_matricula,
+            "responsavel_cpf": novo_responsavel.responsavel_cpf,
+            "responsavel_data_nascimento": str(novo_responsavel.responsavel_data_nascimento) if novo_responsavel.responsavel_data_nascimento else None,
+            "email":novo_responsavel.email,
+            "funcao":novo_responsavel.funcao,
+            "ativo": novo_responsavel.ativo
         }
         solr_client.add([doc_solr])
         logger.info(f"Responsável {novo_responsavel.responsavel_id} indexado no Solr.")
