@@ -8,3 +8,14 @@ def mascarar_campos(lista, campos):
                 item[campo] = "X" * (len(valor) - 2) + valor[-2:]
 
     return lista
+
+
+def mascarar_campos_item(item, campos):
+    for campo in campos:
+        valor = item.get(campo)
+
+        if valor:
+            valor = str(valor)
+            item[campo] = "X" * (len(valor) - 2) + valor[-2:]
+
+    return item

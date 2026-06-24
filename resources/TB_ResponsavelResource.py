@@ -11,7 +11,7 @@ from helpers.solr import solr_client
 from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerificationResponsavel, adicionarResponsavel, deletarResponsavel
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import responsavelVerification, responsavelIsActive
-from helpers.auxiliaryFunctionsResources.mascararCampos import mascarar_campos
+from helpers.auxiliaryFunctionsResources.mascararCampos import mascarar_campos, mascarar_campos_item
 
 from models.TB_Responsavel import TB_Responsavel, TB_ResponsavelSchema, tb_responsavel_fields
 from werkzeug.exceptions import HTTPException 
@@ -149,7 +149,7 @@ class TB_ResponsavelResource(Resource):
 
             resposta = marshal(responsavel, tb_responsavel_fields)
 
-            mascarar_campos(
+            mascarar_campos_item(
                 resposta,
                 ["responsavel_cpf", "responsavel_siap", "responsavel_matricula"]
             )
