@@ -149,6 +149,11 @@ class TB_ResponsavelResource(Resource):
 
             resposta = marshal(responsavel, tb_responsavel_fields)
 
+            mascarar_campos(
+                resposta,
+                ["responsavel_cpf", "responsavel_siap", "responsavel_matricula"]
+            )
+
             preencherRedisCache(cacheKey, resposta)
 
             logger.info(f"Responsável {responsavel_id} retornado do Banco de Dados!")
