@@ -11,6 +11,7 @@ from helpers.solr import solr_client
 from helpers.auxiliaryFunctionsResources.solrFunctions import solrVerificationResponsavel, adicionarResponsavel, deletarResponsavel
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import responsavelVerification, responsavelIsActive
+from helpers.auxiliaryFunctionsResources.mascararCampos import mascarar_campos
 
 from models.TB_Responsavel import TB_Responsavel, TB_ResponsavelSchema, tb_responsavel_fields
 from werkzeug.exceptions import HTTPException 
@@ -50,6 +51,11 @@ class TB_ResponsaveisResource(Resource):
             responsaveis = db.session.execute(query).scalars().all()
 
             resposta = marshal(responsaveis, tb_responsavel_fields)
+
+            mascarar_campos(
+                resposta,
+                ["responsavel_cpf", "responsavel_siap", "responsavel_matricula"]
+            )
 
             preencherRedisCache(cacheKey, resposta)
 
