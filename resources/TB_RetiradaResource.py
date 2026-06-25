@@ -7,7 +7,7 @@ from helpers.database import db
 from helpers.logging import logger, log_exception
 from helpers.redis_cache import redis_client
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
-from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva, chaveVerification, chaveIsDisponivel, responsavelIsActive, responsavelVerification, retiradaVerification, retiradaStatus
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva, chaveVerification, chaveIsDisponivel, responsavelNotActive, responsavelVerification, retiradaVerification, retiradaStatus
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 
 from models.TB_Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
@@ -134,7 +134,7 @@ class TB_RetiradasResource(Resource):
                 return {"erro": "Já existe uma retirada ativa para esta sala"}, 409
 
             responsavelVerification(validado["responsavel_id"])
-            responsavelIsActive(validado["responsavel_id"])
+            responsavelNotActive(validado["responsavel_id"])
 
             retirada = TB_Retirada(**validado)
             db.session.add(retirada)

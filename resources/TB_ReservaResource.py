@@ -157,7 +157,7 @@ class TB_ReservaResource(Resource):
 
             resposta = marshal(reserva, tb_reserva_fields)
 
-            preencherRedisCache(resposta)
+            preencherRedisCache(cacheKey, resposta)
 
             logger.info(f"Reserva {reserva_id} retornado do Banco de Dados!")
 

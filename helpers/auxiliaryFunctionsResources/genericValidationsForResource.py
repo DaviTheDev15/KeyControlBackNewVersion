@@ -41,6 +41,13 @@ def responsavelIsActive(id):
     if responsavel.ativo == True:
         logger.info(f"Responsavel {id} se encontra Ativo")
         abort(404, "Responsavel Ativo")
+
+def responsavelNotActive(id):
+    from models.TB_Responsavel import TB_Responsavel
+    responsavel = db.session.get(TB_Responsavel, id)
+    if responsavel.ativo == False:
+        logger.info(f"Responsavel {id} se encontra Inativo")
+        abort(404, "Responsavel Inativo")
         
 def reservaVerification(id):
     from models.TB_Reserva import TB_Reserva
