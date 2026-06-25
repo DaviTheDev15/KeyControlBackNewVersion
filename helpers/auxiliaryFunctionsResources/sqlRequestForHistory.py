@@ -102,6 +102,18 @@ def sqlRequisicaoGetById(retirada_id):
 
         resultado = dict(row)
 
+        if resultado.get("data_retirada"):
+            resultado["data_retirada"] = resultado["data_retirada"].isoformat()
+
+        if resultado.get("hora_retirada"):
+            resultado["hora_retirada"] = resultado["hora_retirada"].strftime("%H:%M")
+
+        if resultado.get("hora_prevista_devolucao"):
+            resultado["hora_prevista_devolucao"] = resultado["hora_prevista_devolucao"].strftime("%H:%M")
+
+        if resultado.get("hora_devolucao"):
+            resultado["hora_devolucao"] = resultado["hora_devolucao"].strftime("%H:%M")
+
         return resultado
 
     except Exception:
