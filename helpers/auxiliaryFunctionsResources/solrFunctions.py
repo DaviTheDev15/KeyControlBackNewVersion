@@ -73,7 +73,8 @@ def deletarResponsavel(responsavel_id):
 
 def deletarSala(sala_id):
     try:
-        solr_client.delete(id=str(sala_id))
+        solr_client.delete(id=f"sala_{sala_id}")
+        solr_client.commit()
         logger.info(f"Sala {sala_id} removido do Solr.")
     except Exception:
         log_exception(f"Falha ao remover Solr. Id: {sala_id}")
