@@ -16,6 +16,8 @@ class MeResource(Resource):
             return {"message": "Usuário não encontrado"}, 404
  
         return {
+            "id": responsavel.responsavel_id,
             "usuario": responsavel.responsavel_nome,
+            "email": responsavel.email,
             "funcao":  responsavel.funcao,
         }, 200
