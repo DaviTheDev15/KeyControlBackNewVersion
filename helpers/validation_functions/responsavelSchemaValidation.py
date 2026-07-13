@@ -13,7 +13,14 @@ def validar_unique_siap(value):
     from models.TB_Responsavel import TB_Responsavel
     if db.session.query(TB_Responsavel).filter_by(responsavel_siap=value).first():
         raise ValidationError(
-            "Já existe um Responsavel cadastrado com esse SIAP."
+            "Já existe um Responsavel cadastrado com esse SIAPE."
+        )
+    
+def validar_unique_matricula(value):
+    from models.TB_Responsavel import TB_Responsavel
+    if db.session.query(TB_Responsavel).filter_by(responsavel_matricula=value).first():
+        raise ValidationError(
+            "Já existe um Responsavel cadastrado com essa Matricula."
         )
     
 
