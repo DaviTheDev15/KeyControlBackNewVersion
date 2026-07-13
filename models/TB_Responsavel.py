@@ -22,8 +22,6 @@ tb_responsavel_fields = {
     'funcao': flaskFields.String,
     'ativo': flaskFields.Boolean
 }
-
-202313810011
     
 class TB_Responsavel(db.Model):
     __tablename__ = "tb_responsavel"
