@@ -15,6 +15,7 @@ from repositories.responsavel_repository import ResponsavelRepository
 from services.responsavel_service import ResponsavelService
 
 
+
 class TB_ResponsaveisResource(Resource):
 
     def get(self):
