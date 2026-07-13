@@ -7,7 +7,7 @@ from models.TB_Responsavel import TB_Responsavel
 class ResponsavelRepository:
 
     @staticmethod
-    def get_all():
+    def get_all(query):
         """
         Retorna todos os responsáveis aplicando a ordenação padrão.
         """
