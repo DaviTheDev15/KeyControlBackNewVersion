@@ -1,41 +1,30 @@
-# services/responsavel_service.py
-
 import json
-
 from flask_restful import marshal
-
 from helpers.redis_cache import redis_client
 from helpers.logging import logger
-
 from helpers.auxiliaryFunctionsResources.redisCacheFunctions import (
     preencherRedisCache,
     verificarRedisCache
 )
-
 from helpers.auxiliaryFunctionsResources.solrFunctions import (
     adicionarResponsavel,
     deletarResponsavel,
     solrVerificationResponsavel
 )
-
 from helpers.auxiliaryFunctionsResources.mascararCampos import (
     mascarar_campos,
     mascarar_campos_item
 )
-
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
     responsavelVerification,
     responsavelIsActive
 )
-
 from helpers.database import db
-
 from models.TB_Responsavel import (
     TB_Responsavel,
     tb_responsavel_fields
 )
-
 from repositories.responsavel_repository import ResponsavelRepository
 
 
