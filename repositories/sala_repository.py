@@ -1,6 +1,7 @@
 from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 from models.TB_Sala import TB_Sala
+from models.TB_Chave import TB_Chave
 
 class SalaRepository:
     
@@ -39,6 +40,16 @@ class SalaRepository:
     @staticmethod
     def update():
         db.session.commit()
+
+
+    @staticmethod
+    def get_chaves_da_sala(sala_id):
+        return (
+            db.session.query(TB_Chave)
+            .filter(TB_Chave.sala_id == sala_id)
+            .order_by(TB_Chave.chave_id)
+            .all()
+        )
 
 
     @staticmethod
