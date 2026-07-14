@@ -62,3 +62,10 @@ class SalaRepository:
     def rollback():
         db.session.rollback()
         
+
+    @staticmethod
+    def save_chave(chave):
+        db.session.add(chave)
+        db.session.commit()
+
+        return chave

@@ -107,8 +107,15 @@ class SalaService:
     def criar(validado):
 
         sala = TB_Sala(**validado)
-
         SalaRepository.save(sala)
+
+        chave = TB_Chave(
+            chave_nome=f"Chave {sala.sala_nome} 01",
+            sala_id=sala.sala_id,
+            disponivel=True
+        )
+
+        SalaRepository.save_chave(chave)
 
         adicionarSala(sala)
 
