@@ -15,7 +15,7 @@ class SalaRepository:
         }, "id"
         )
 
-        return db.session.execute(query).scalar().all()
+        return db.session.execute(query).scalars().all()
     
 
     @staticmethod
