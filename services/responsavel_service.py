@@ -91,6 +91,7 @@ class ResponsavelService:
             resposta
         )
 
+        logger.info("Retornando responsáveis do Banco de Dados.")
         return resposta
 
 
@@ -105,6 +106,7 @@ class ResponsavelService:
         )
 
         if cache:
+            logger.info("Retornando responsáveis do Redis.")
             return json.loads(cache)
 
         responsavel = ResponsavelRepository.get_by_id(
@@ -133,7 +135,7 @@ class ResponsavelService:
             cache_key,
             resposta
         )
-
+        logger.info("Retornando responsáveis do Banco de Dados.")
         return resposta
 
 
@@ -213,3 +215,4 @@ class ResponsavelService:
         )
 
         redis_client.delete_pattern("responsaveis:*")
+        

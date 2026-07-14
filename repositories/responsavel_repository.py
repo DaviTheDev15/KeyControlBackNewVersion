@@ -8,9 +8,6 @@ class ResponsavelRepository:
 
     @staticmethod
     def get_all(query):
-        """
-        Retorna todos os responsáveis aplicando a ordenação padrão.
-        """
 
         query = db.select(TB_Responsavel)
 
@@ -29,25 +26,16 @@ class ResponsavelRepository:
 
     @staticmethod
     def get_by_id(responsavel_id: int):
-        """
-        Busca um responsável pelo ID.
-        """
         return db.session.get(TB_Responsavel, responsavel_id)
 
 
     @staticmethod
     def first():
-        """
-        Retorna o primeiro responsável cadastrado.
-        """
         return db.session.query(TB_Responsavel).first()
 
 
     @staticmethod
     def save(responsavel: TB_Responsavel):
-        """
-        Salva um novo responsável.
-        """
         db.session.add(responsavel)
         db.session.commit()
 
@@ -56,24 +44,15 @@ class ResponsavelRepository:
 
     @staticmethod
     def update():
-        """
-        Persiste alterações realizadas em um responsável.
-        """
         db.session.commit()
 
 
     @staticmethod
     def delete(responsavel: TB_Responsavel):
-        """
-        Remove um responsável.
-        """
         db.session.delete(responsavel)
         db.session.commit()
 
 
     @staticmethod
     def rollback():
-        """
-        Desfaz a transação atual.
-        """
         db.session.rollback()
