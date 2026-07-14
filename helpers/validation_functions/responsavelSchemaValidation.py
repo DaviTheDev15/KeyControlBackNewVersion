@@ -23,6 +23,13 @@ def validar_unique_matricula(value):
             "Já existe um Responsavel cadastrado com essa Matricula."
         )
     
+def validar_unique_email(value):
+    from models.TB_Responsavel import TB_Responsavel
+    if db.session.query(TB_Responsavel).filter_by(email=value).first():
+        raise ValidationError(
+            "Já existe um Responsavel cadastrado com essa Email."
+        )
+    
 
 def validarIdade(data_nascimento):
     hoje = date.today()

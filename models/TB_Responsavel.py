@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Date, Boolean
 from helpers.database import db
 from helpers.validation_functions.genericValidations import DateFormat, validate_positive, montarDicionarioDeMensagemDeErro
-from helpers.validation_functions.responsavelSchemaValidation import validar_unique_cpf, validar_unique_siap, validar_unique_matricula, validarIdade
+from helpers.validation_functions.responsavelSchemaValidation import validar_unique_cpf, validar_unique_siap, validar_unique_matricula, validar_unique_email, validarIdade
 from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
 
@@ -108,3 +108,7 @@ class TB_ResponsavelSchema(Schema):
     @validates("responsavel_matricula")
     def validate_unique_matricula(self, value, **kwargs):
         validar_unique_matricula(value)
+
+    @validates("email")
+    def validate_unique_email(self, value, **kwargs):
+        validar_unique_email(value)
