@@ -11,8 +11,8 @@ from models.Chave import (
     tb_chave_fields
 )
 
-from repositories.chave_repository import ChaveRepository
-from services.chaves_service import ChaveService
+from repositories.chaveRepository import ChaveRepository
+from services.chaveService import ChaveService
 
 
 class TB_ChavesResource(Resource):

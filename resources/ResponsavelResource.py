@@ -11,8 +11,8 @@ from models.Responsavel import (
     tb_responsavel_fields
 )
 
-from repositories.responsavel_repository import ResponsavelRepository
-from services.responsavel_service import ResponsavelService
+from repositories.responsavelRepository import ResponsavelRepository
+from services.responsavelService import ResponsavelService
 
 
 

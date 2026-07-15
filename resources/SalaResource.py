@@ -11,8 +11,8 @@ from models.Sala import (
     tb_sala_fields
 )
 
-from repositories.sala_repository import SalaRepository
-from services.sala_service import SalaService
+from repositories.salaRepository import SalaRepository
+from services.salaService import SalaService
 
 
 class TB_SalasResource(Resource):

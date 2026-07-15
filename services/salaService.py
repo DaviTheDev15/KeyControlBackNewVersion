@@ -21,7 +21,7 @@ from models.Sala import (
     tb_sala_fields
 )
 from models.Chave import TB_Chave
-from repositories.sala_repository import SalaRepository
+from repositories.salaRepository import SalaRepository
 
 
 class SalaService:
