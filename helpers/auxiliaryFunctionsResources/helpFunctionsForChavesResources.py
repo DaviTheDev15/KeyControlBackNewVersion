@@ -2,8 +2,8 @@ from helpers.database import db
 from sqlalchemy import func
 
 def gerar_nome_da_chave(sala_id):
-    from models.TB_Chave import TB_Chave
-    from models.TB_Sala import TB_Sala
+    from models.Chave import TB_Chave
+    from models.Sala import TB_Sala
     sala = db.session.get(TB_Sala, sala_id)
     if not sala:
         return {"erro":"Sala não encontrada"}, 404

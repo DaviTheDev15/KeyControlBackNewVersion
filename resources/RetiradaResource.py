@@ -10,11 +10,11 @@ from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRed
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva, chaveVerification, chaveIsDisponivel, responsavelNotActive, responsavelVerification, retiradaVerification, retiradaStatus
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 
-from models.TB_Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
-from models.TB_Chave import TB_Chave
-from models.TB_Responsavel import TB_Responsavel
-from models.TB_Reserva import TB_Reserva
-from models.TB_Sala import TB_Sala
+from models.Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
+from models.Chave import TB_Chave
+from models.Responsavel import TB_Responsavel
+from models.Reserva import TB_Reserva
+from models.Sala import TB_Sala
 
 from werkzeug.exceptions import HTTPException 
 

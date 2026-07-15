@@ -6,7 +6,7 @@ from werkzeug.exceptions import HTTPException
 
 from helpers.logging import logger, log_exception
 
-from models.TB_Responsavel import (
+from models.Responsavel import (
     TB_ResponsavelSchema,
     tb_responsavel_fields
 )

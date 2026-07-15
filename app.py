@@ -3,11 +3,11 @@ from helpers.database import db
 from helpers.CORS import cors
 
 from resources.IndexResource import IndexResource
-from resources.TB_ResponsavelResource import TB_ResponsaveisResource, TB_ResponsavelResource
-from resources.TB_SalaResource import TB_SalasResource, TB_SalaResource
-from resources.TB_ChaveResource import TB_ChavesResource, TB_ChaveResource
-from resources.TB_ReservaResource import TB_ReservasResource, TB_ReservaResource
-from resources.TB_RetiradaResource import TB_RetiradasResource, TB_RetiradaResource
+from resources.ResponsavelResource import TB_ResponsaveisResource, TB_ResponsavelResource
+from resources.SalaResource import TB_SalasResource, TB_SalaResource
+from resources.ChaveResource import TB_ChavesResource, TB_ChaveResource
+from resources.ReservaResource import TB_ReservasResource, TB_ReservaResource
+from resources.RetiradaResource import TB_RetiradasResource, TB_RetiradaResource
 from resources.HistoricoResource import HistoricoResource, HistoricoByIdResource
 
 from resources.AuthResource import AuthResource

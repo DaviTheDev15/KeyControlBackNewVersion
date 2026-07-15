@@ -16,11 +16,11 @@ from helpers.auxiliaryFunctionsResources.solrFunctions import (
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
     salaVerification
 )
-from models.TB_Sala import (
+from models.Sala import (
     TB_Sala,
     tb_sala_fields
 )
-from models.TB_Chave import TB_Chave
+from models.Chave import TB_Chave
 from repositories.sala_repository import SalaRepository
 
 

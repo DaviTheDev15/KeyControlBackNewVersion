@@ -13,7 +13,7 @@ from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
     salaVerification,
     chaveVerification
 )
-from models.TB_Chave import (
+from models.Chave import (
     TB_Chave,
     tb_chave_fields
 )

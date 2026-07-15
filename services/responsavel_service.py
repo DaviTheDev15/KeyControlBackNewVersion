@@ -21,7 +21,7 @@ from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
     responsavelIsActive
 )
 from helpers.database import db
-from models.TB_Responsavel import (
+from models.Responsavel import (
     TB_Responsavel,
     tb_responsavel_fields
 )

@@ -1,7 +1,7 @@
 from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
-from models.TB_Sala import TB_Sala
-from models.TB_Chave import TB_Chave
+from models.Sala import TB_Sala
+from models.Chave import TB_Chave
 
 class SalaRepository:
     

@@ -6,7 +6,7 @@ from werkzeug.exceptions import HTTPException
 
 from helpers.logging import logger, log_exception
 
-from models.TB_Chave import (
+from models.Chave import (
     TB_ChaveSchema,
     tb_chave_fields
 )

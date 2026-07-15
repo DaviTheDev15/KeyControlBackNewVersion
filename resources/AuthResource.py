@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request, make_response, jsonify
-from models.TB_Responsavel import TB_Responsavel
+from models.Responsavel import TB_Responsavel
 from flask_jwt_extended import create_access_token, set_access_cookies
 
 class AuthResource(Resource):

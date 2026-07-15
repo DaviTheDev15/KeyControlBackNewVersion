@@ -1,6 +1,6 @@
 from helpers.database import db
 
-from models.TB_Chave import TB_Chave
+from models.Chave import TB_Chave
 
 
 class ChaveRepository:

@@ -1,7 +1,7 @@
 from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 
-from models.TB_Responsavel import TB_Responsavel
+from models.Responsavel import TB_Responsavel
 
 
 class ResponsavelRepository:

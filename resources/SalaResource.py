@@ -6,7 +6,7 @@ from werkzeug.exceptions import HTTPException
 
 from helpers.logging import logger, log_exception
 
-from models.TB_Sala import (
+from models.Sala import (
     TB_SalaSchema,
     tb_sala_fields
 )
