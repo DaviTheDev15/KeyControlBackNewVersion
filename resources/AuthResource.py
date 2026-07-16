@@ -32,8 +32,10 @@ class AuthResource(Resource):
         
         response = make_response(
             jsonify({
+                "id":usuario.responsavel_id,
                 "usuario": usuario.responsavel_nome,
                 "funcao": usuario.funcao,
+                "email": usuario.email,
             }),
             200
         )
