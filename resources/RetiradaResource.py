@@ -2,308 +2,267 @@ from flask import request, abort
 from flask_restful import Resource, marshal
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import text, and_
-from helpers.database import db
+from werkzeug.exceptions import HTTPException
+
 from helpers.logging import logger, log_exception
-from helpers.redis_cache import redis_client
-from helpers.auxiliaryFunctionsResources.redisCacheFunctions import preencherRedisCache, verificarRedisCache
-from helpers.auxiliaryFunctionsResources.genericValidationsForResource import reservaVerification, reservaStatusIsAtiva, chaveVerification, chaveIsDisponivel, responsavelNotActive, responsavelVerification, retiradaVerification, retiradaStatus
-from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 
-from models.Retirada import TB_Retirada, TB_RetiradaSchema, tb_retirada_fields
-from models.Chave import TB_Chave
-from models.Responsavel import TB_Responsavel
-from models.Reserva import TB_Reserva
-from models.Sala import TB_Sala
+from models.Retirada import (
+    TB_RetiradaSchema,
+    tb_retirada_fields
+)
 
-from werkzeug.exceptions import HTTPException 
-
-import json
-from datetime import date, datetime, timedelta
+from repositories.retiradaRepository import RetiradaRepository
+from services.retiradaService import RetiradaService
 
 
 class TB_RetiradasResource(Resource):
+
     def get(self):
+
         logger.info("GET ALL - Listagem de Retiradas")
 
         try:
-            cacheKey = "retiradas:*"
 
-            cache = verificarRedisCache("Retiradas", cacheKey)
+            resposta = RetiradaService.listar()
 
-            if cache:
-                logger.info("Retornando Retiradas do Redis")
-                return json.loads(cache), 200
-            
-        except Exception:
-            log_exception("Erro ao acessar Redis")
-            abort(500, "Erro ao acessar cache")
-
-        try:
-            logger.info("Redis Cache estava vazio!")
-            logger.info("Buscando no Banco de Dados!")
-
-            query = db.select(TB_Retirada)
-            query = aplicar_ordenacao(query, {"id":TB_Retirada.retirada_id, "chave":TB_Retirada.chave_id, "responsavel":TB_Retirada.responsavel_id, "reserva":TB_Retirada.reserva_id, "data":TB_Retirada.data_retirada,"status":TB_Retirada.status}, "id")
-
-
-            retiradas = db.session.execute(query).scalars().all()
-
-            resposta = marshal(retiradas, tb_retirada_fields)
-
-            preencherRedisCache(cacheKey, resposta)
-
-            logger.info("Retornando Retiradas do Banco de Dados")
             return resposta, 200
-        
+
         except SQLAlchemyError:
-            log_exception("Erro SQLAlchemy ao buscar TB_Retiradas")
-            db.session.rollback()
-            abort(500, "Erro ao buscar TB_Retiradas no banco de dados")
 
-        except HTTPException:
-            raise
-
-        except Exception:
-            log_exception("Erro inesperado ao buscar TB_Retiradas")
-            abort(500, description="Erro interno inesperado.")
-
-    def post(self):
-        logger.info("Post - Nova Retirada")
-        dados = request.get_json()
-        schema = TB_RetiradaSchema()
-
-        try:
-            validado = schema.load(dados)
-            hoje = date.today()
-
-            chave = db.session.get(TB_Chave, validado["chave_id"])
-
-            chaveVerification(validado["chave_id"])
-
-            sala = db.session.get(TB_Sala, chave.sala_id)
-
-            chaveIsDisponivel(validado["chave_id"])
-
-            if validado.get("reserva_id") is not None:
-
-                reserva = db.session.get(TB_Reserva, validado["reserva_id"])
-                reservaVerification(validado["reserva_id"])
-                reservaStatusIsAtiva(validado["reserva_id"])
-                
-                if not (reserva.data_inicio <= hoje <= reserva.data_fim):
-                    logger.info("Hoje não está dentro do período da reserva")
-                    return {"erro": "Hoje não está dentro do período da reserva"}, 409
-
-                if reserva.frequencia not in ("única", "mensal"):
-                    dia_semana_hoje = hoje.isoweekday()
-                    dias_permitidos = [d.dia_semana for d in reserva.tb_reserva_dia]
-
-                    if dia_semana_hoje not in dias_permitidos:
-                        logger.info("Hoje não é um dia permitido pela reserva")
-                        return {"erro": "Hoje não é um dia permitido pela reserva"}, 409
-                    
-                hora_retirada = validado["hora_retirada"]
-
-                hora_minima = (
-                        datetime.combine(hoje, reserva.hora_inicio) - timedelta(minutes=10)
-                    ).time()
-
-                if not (hora_minima <= hora_retirada <= reserva.hora_fim):
-                    return {
-                        "erro": "Retirada fora do intervalo permitido da reserva"
-                    }, 409
-                
-                if reserva.sala_id != chave.sala_id:
-                    return {
-                        "erro": "Reserva não pertence à sala da chave informada"
-                    }, 409
-
-            retirada_ativa = (
-                db.session.query(TB_Retirada)
-                .join(TB_Chave, TB_Retirada.chave_id == TB_Chave.chave_id)
-                .filter(
-                    TB_Chave.sala_id == chave.sala_id,
-                    TB_Retirada.status.in_(["retirada", "atrasada"])
-                )
-                .first()
+            log_exception(
+                "Erro SQLAlchemy ao buscar Retiradas"
             )
 
-            if retirada_ativa:
-                logger.info("Já existe uma retirada ativa para esta sala")
-                return {"erro": "Já existe uma retirada ativa para esta sala"}, 409
+            RetiradaRepository.rollback()
 
-            responsavelVerification(validado["responsavel_id"])
-            responsavelNotActive(validado["responsavel_id"])
-
-            retirada = TB_Retirada(**validado)
-            db.session.add(retirada)
-
-            chave.disponivel = False
-            sala.disponivel = False
-
-            db.session.commit()
-
-            redis_client.delete_pattern("retiradas:*")
-            redis_client.delete_pattern("historicos:*")
-
-            return marshal(retirada, tb_retirada_fields), 201
-
-        except ValidationError as err:
-            logger.info(f"Dados inválidos: {err.messages}")
-            return {"erro": "Dados inválidos", "detalhes": err.messages}, 422
-
-        except SQLAlchemyError:
-            logger.info("Erro SQLAlchemy ao inserir Retirada")
-            log_exception("Erro SQLAlchemy ao criar Retirada")
-            db.session.rollback()
-            abort(500, "Erro ao criar Retirada")
+            abort(
+                500,
+                description="Erro ao buscar Retiradas no banco de dados."
+            )
 
         except HTTPException:
             raise
 
         except Exception:
-            logger.info("Erro inesperado ao inserir Retirada")
-            log_exception("Erro inesperado ao inserir Retirada")
-            abort(500, "Erro interno Retirada.")
+
+            log_exception(
+                "Erro inesperado ao buscar Retiradas"
+            )
+
+            abort(
+                500,
+                description="Erro interno inesperado."
+            )
+
+
+    def post(self):
+
+        logger.info("POST - Nova Retirada")
+
+        schema = TB_RetiradaSchema()
+
+        dados = request.get_json()
+
+        try:
+
+            validado = schema.load(dados)
+
+            resposta = RetiradaService.criar(validado)
+
+            if isinstance(resposta, tuple):
+                return resposta
+
+            return marshal(
+                resposta,
+                tb_retirada_fields
+            ), 201
+
+        except ValidationError as err:
+
+            logger.info(
+                f"Dados inválidos: {err.messages}"
+            )
+
+            return {
+                "erro": "Dados inválidos",
+                "detalhes": err.messages
+            }, 422
+
+        except SQLAlchemyError:
+
+            log_exception(
+                "Erro SQLAlchemy ao criar Retirada"
+            )
+
+            RetiradaRepository.rollback()
+
+            abort(
+                500,
+                description="Erro ao criar Retirada."
+            )
+
+        except HTTPException:
+            raise
+
+        except Exception:
+
+            log_exception(
+                "Erro inesperado ao criar Retirada"
+            )
+
+            abort(
+                500,
+                description="Erro interno inesperado."
+            )
 
 
 class TB_RetiradaResource(Resource):
+
     def get(self, retirada_id):
-        logger.info(f"GET - Retirada {retirada_id}")
+
+        logger.info(
+            f"GET - Retirada {retirada_id}"
+        )
 
         try:
-            cacheKey = f"retiradas:{retirada_id}"
-            logger.info(f"Verificando se há dados da retirada {retirada_id} no Redis")
-            cache = verificarRedisCache("Retiradas", cacheKey)
-            
-            if cache:
-                logger.info(f"Retornando retirada {retirada_id} do Redis!")
-                return json.loads(cache), 200
-            
-        except Exception:
-            logger.info("Erro ao acessar o Redis Cache")
-            log_exception("Erro ao acessar Redis")
-            abort(500, description="Erro ao acessar o Redis Cache")
 
+            resposta = RetiradaService.buscar_por_id(
+                retirada_id
+            )
 
-        try:
-            logger.info("Redis Cache estava vazio!")
-            logger.info("Buscando no Banco de Dados!")
-            retirada = db.session.get(TB_Retirada, retirada_id)
-            retiradaVerification(retirada_id)
-
-            resposta = marshal(retirada, tb_retirada_fields)
-
-            preencherRedisCache(cacheKey, resposta)
-
-            logger.info(f"Retirada {retirada_id} retornada do Banco de Dados!")
             return resposta, 200
 
         except SQLAlchemyError:
-            logger.info(f"Erro SQLAlchemy ao buscar Retirada {retirada_id}")
-            log_exception("Erro SQLAlchemy ao buscar Retirada")
-            abort(500, description="Erro ao buscar Retirada no banco de dados")
+
+            log_exception(
+                "Erro SQLAlchemy ao buscar Retirada"
+            )
+
+            abort(
+                500,
+                description="Erro ao buscar Retirada."
+            )
 
         except HTTPException:
             raise
 
         except Exception:
-            logger.info("Erro inesperado ao buscar Retirada")
-            log_exception("Erro inesperado ao buscar Retirada")
-            abort(500, "Erro interno inesperado")                          
+
+            log_exception(
+                "Erro inesperado ao buscar Retirada"
+            )
+
+            abort(
+                500,
+                description="Erro interno inesperado."
+            )
+
 
     def put(self, retirada_id):
-        logger.info(f"PUT - Editando Retirada {retirada_id}")
 
-        dados = request.get_json()
+        logger.info(
+            f"PUT - Editando Retirada {retirada_id}"
+        )
+
         schema = TB_RetiradaSchema()
 
+        dados = request.get_json()
+
         try:
-            retirada = db.session.get(TB_Retirada, retirada_id)
-            retiradaVerification(retirada_id)
-            
-            status_anterior = retirada.status
-            
-            atualizados = schema.load(dados, partial=True)
 
-            campos_permitidos = {"status", "hora_devolucao"}
+            validado = schema.load(
+                dados,
+                partial=True
+            )
 
-            for campo, valor in atualizados.items():
-                if campo in campos_permitidos:
-                    setattr(retirada, campo, valor)
+            resposta = RetiradaService.atualizar(
+                retirada_id,
+                validado
+            )
 
-            if (
-                status_anterior in ("retirada", "atrasada")
-                and retirada.status == "devolvida"
-            ):
-                chave = db.session.get(TB_Chave, retirada.chave_id)
-                sala = db.session.get(TB_Sala, chave.sala_id)
+            return marshal(
+                resposta,
+                tb_retirada_fields
+            ), 200
 
-                retirada_ativa = (
-                    db.session.query(TB_Retirada)
-                    .join(TB_Chave)
-                    .filter(
-                        TB_Chave.sala_id == sala.sala_id,
-                        TB_Retirada.status.in_(["retirada", "atrasada"])
-                    )
-                    .first()
-                )
-
-                if not retirada_ativa:
-                    sala.disponivel = True
-                    chave.disponivel = True
-            db.session.commit()
-
-            redis_client.delete(f"retiradas:*")
-            redis_client.delete_pattern("historicos:*")
-
-            return marshal(retirada, tb_retirada_fields), 200
-        
         except ValidationError as err:
-            logger.info(f"Dados inválidos, detalhes: {err.messages}")
-            return {"erro": "Dados inválidos", "detalhes": err.messages}, 422
-        
+
+            logger.info(
+                f"Dados inválidos: {err.messages}"
+            )
+
+            return {
+                "erro": "Dados inválidos",
+                "detalhes": err.messages
+            }, 422
+
         except SQLAlchemyError:
-            logger.info(f"Erro SQLAlchemy ao atualizar Retirada")
-            log_exception("Erro SQLAlchemy ao atualizar Retirada")
-            db.session.rollback()
-            abort(500, description="Erro ao atualizar Retirada.")
+
+            log_exception(
+                "Erro SQLAlchemy ao atualizar Retirada"
+            )
+
+            RetiradaRepository.rollback()
+
+            abort(
+                500,
+                description="Erro ao atualizar Retirada."
+            )
 
         except HTTPException:
             raise
 
         except Exception:
-            logger.info("Erro inesperado ao atualizar Retirada")
-            log_exception("Erro inesperado ao atualizar Retirada")
-            abort(500, description="Erro interno inesperado.")  
+
+            log_exception(
+                "Erro inesperado ao atualizar Retirada"
+            )
+
+            abort(
+                500,
+                description="Erro interno inesperado."
+            )
+
 
     def delete(self, retirada_id):
-        logger.info("DELETE - Apagando Retirada")
+
+        logger.info(
+            f"DELETE - Retirada {retirada_id}"
+        )
 
         try:
-            retirada = db.session.get(TB_Retirada, retirada_id)
-            retiradaVerification(retirada_id)
-            retiradaStatus(retirada_id)
-            
-            db.session.delete(retirada)
-            db.session.commit()
-            
-            redis_client.delete(f"retirada:*")
-            redis_client.delete_pattern("historicos:*")
 
-            return {"mensagem":"Retirada removida com sucesso"}, 200
-        
+            RetiradaService.remover(
+                retirada_id
+            )
+
+            return {
+                "mensagem": "Retirada removida com sucesso."
+            }, 200
+
         except SQLAlchemyError:
-            logger.info("Erro SQLAlchemy ao remover Retirada")
-            log_exception("Erro SQLAlchemy ao remover Retirada")
-            db.session.rollback()
-            abort(500, description="Erro ao remover Retirada.")
+
+            log_exception(
+                "Erro SQLAlchemy ao remover Retirada"
+            )
+
+            RetiradaRepository.rollback()
+
+            abort(
+                500,
+                description="Erro ao remover Retirada."
+            )
 
         except HTTPException:
             raise
 
         except Exception:
-            logger.info("Erro inesperado ao remover Retirada")
-            log_exception("Erro inesperado ao remover Retirada")
-            abort(500, "Erro interno inesperado.")
+
+            log_exception(
+                "Erro inesperado ao remover Retirada"
+            )
+
+            abort(
+                500,
+                description="Erro interno inesperado."
+            )
