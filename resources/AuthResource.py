@@ -43,3 +43,4 @@ class AuthResource(Resource):
         set_access_cookies(response, access_token)
  
         return response
+
