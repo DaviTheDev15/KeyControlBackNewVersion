@@ -145,7 +145,7 @@ class RetiradaService:
                     description="Reserva não pertence à sala da chave."
                 )
 
-        if RetiradaRepository.existe_retirada_ativa_na_sala(
+        if RetiradaRepository.get_retirada_ativa_da_sala(
             chave.sala_id
         ):
             abort(
@@ -170,7 +170,11 @@ class RetiradaService:
     
 
     @staticmethod
-    def atualizar(retirada, atualizados):
+    def atualizar(retirada_id, atualizados):
+
+        retirada = RetiradaRepository.get_by_id(retirada_id)
+
+        retiradaVerification(retirada_id)
 
         status_anterior = retirada.status
 
@@ -193,7 +197,7 @@ class RetiradaService:
 
             sala = SalaRepository.get_by_id(chave.sala_id)
 
-            if not RetiradaRepository.existe_retirada_ativa_na_sala(
+            if not RetiradaRepository.get_retirada_ativa_da_sala(
                 sala.sala_id
             ):
                 chave.disponivel = True
@@ -208,9 +212,13 @@ class RetiradaService:
     
 
     @staticmethod
-    def remover(retirada):
+    def remover(retirada_id):
 
-        retiradaStatus(retirada.retirada_id)
+        retirada = RetiradaRepository.get_by_id(retirada_id)
+
+        retiradaVerification(retirada_id)
+
+        retiradaStatus(retirada_id)
 
         RetiradaRepository.delete(retirada)
 
