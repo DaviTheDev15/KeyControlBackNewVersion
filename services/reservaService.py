@@ -71,6 +71,7 @@ class ReservaService:
             resposta
         )
 
+        logger.info("Retornando Reservas do Banco de Dados.")
         return resposta
 
 
@@ -85,6 +86,7 @@ class ReservaService:
         )
 
         if cache:
+            logger.info("Retornando Reservas do Redis.")
             return json.loads(cache)
 
         reserva = ReservaRepository.get_by_id(
@@ -105,6 +107,7 @@ class ReservaService:
             resposta
         )
 
+        logger.info("Retornando Reservas do Banco de Dados.")
         return resposta
 
 

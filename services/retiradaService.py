@@ -41,6 +41,7 @@ class RetiradaService:
 
         cache = verificarRedisCache("Retiradas", cache_key)
         if cache:
+            logger.info("Retornando Retiradas do Redis.")
             return json.loads(cache)
 
         query = db.select(TB_Retirada)
@@ -64,6 +65,7 @@ class RetiradaService:
 
         preencherRedisCache(cache_key, resposta)
 
+        logger.info("Retornando Retiradas do Banco de Dados.")
         return resposta
     
 
@@ -74,6 +76,7 @@ class RetiradaService:
         cache = verificarRedisCache("Retiradas", cache_key)
 
         if cache:
+            logger.info("Retornando Retiradas do Redis.")
             return json.loads(cache)
 
         retirada = RetiradaRepository.get_by_id(retirada_id)
@@ -84,6 +87,7 @@ class RetiradaService:
 
         preencherRedisCache(cache_key, resposta)
 
+        logger.info("Retornando Retiradas do Banco de Dados.")
         return resposta
     
 

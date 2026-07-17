@@ -60,6 +60,7 @@ class ChaveService:
             resposta
         )
 
+        logger.info("Retornando Chaves do Banco de Dados.")
         return resposta
 
 
@@ -74,6 +75,7 @@ class ChaveService:
         )
 
         if cache:
+            logger.info("Retornando Chaves do Redis.")
             return json.loads(cache)
 
         chave = ChaveRepository.get_by_id(
@@ -94,6 +96,7 @@ class ChaveService:
             resposta
         )
 
+        logger.info("Retornando Chaves do Banco de Dados.")
         return resposta
 
 
