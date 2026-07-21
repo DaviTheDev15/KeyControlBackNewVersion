@@ -18,6 +18,11 @@ class MeResource(Resource):
         return {
             "id": responsavel.responsavel_id,
             "usuario": responsavel.responsavel_nome,
+            "data_nascimento":(
+                responsavel.responsavel_data_nascimento.isoformat()
+                if responsavel.responsavel_data_nascimento
+                else None
+                ),
             "email": responsavel.email,
             "funcao":  responsavel.funcao,
         }, 200
