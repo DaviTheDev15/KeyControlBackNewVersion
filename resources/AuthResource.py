@@ -34,6 +34,11 @@ class AuthResource(Resource):
             jsonify({
                 "id":usuario.responsavel_id,
                 "usuario": usuario.responsavel_nome,
+                "data_nascimento":(
+                    usuario.responsavel_data_nascimento.isoformat()
+                    if usuario.responsavel_data_nascimento
+                    else None
+                ),
                 "funcao": usuario.funcao,
                 "email": usuario.email,
             }),
