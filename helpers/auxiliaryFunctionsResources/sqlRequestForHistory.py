@@ -28,7 +28,6 @@ def sqlRequisicaoGetAll():
             JOIN tb_chave c ON c.chave_id = r.chave_id
             JOIN tb_sala s ON s.sala_id = c.sala_id
             JOIN tb_responsavel resp ON resp.responsavel_id = r.responsavel_id
-            WHERE r.status = 'devolvida'
             """
 
         params = {}
@@ -88,8 +87,7 @@ def sqlRequisicaoGetById(retirada_id):
             JOIN tb_chave c ON c.chave_id = r.chave_id
             JOIN tb_sala s ON s.sala_id = c.sala_id
             JOIN tb_responsavel resp ON resp.responsavel_id = r.responsavel_id
-            WHERE r.status = 'devolvida'
-                AND r.retirada_id = :retirada_id
+            WHERE r.retirada_id = :retirada_id
             """
 
         row = db.session.execute(
