@@ -4,7 +4,7 @@ from helpers.database import db
 from helpers.validation_functions.genericValidations import montarDicionarioDeMensagemDeErro
 from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
-from datetime import datetime
+from datetime import datetime, UTC
 
 tb_sala_fields = {
     'sala_id': flaskFields.Integer,
@@ -20,7 +20,7 @@ class TB_Sala(db.Model):
     sala_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     sala_nome: Mapped[str] = mapped_column(String(255), nullable=False)
     disponivel: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     tb_chave = relationship("TB_Chave", back_populates="tb_sala")
