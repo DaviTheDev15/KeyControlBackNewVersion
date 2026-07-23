@@ -40,5 +40,5 @@ class TB_SalaSchema(Schema):
         error_messages=montarDicionarioDeMensagemDeErro("disponivel", ["required", "invalid"]))
     
     created_at = fields.DateTime(
-        required=True
+        required=False
     )
