@@ -20,7 +20,7 @@ class TB_Sala(db.Model):
     sala_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     sala_nome: Mapped[str] = mapped_column(String(255), nullable=False)
     disponivel: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=True)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     tb_chave = relationship("TB_Chave", back_populates="tb_sala")
