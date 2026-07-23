@@ -11,7 +11,7 @@ def solrVerificationResponsavel(text):
 
         if len(results) == 0:
             logger.info("Nenhum resultado por prefixo. Tentando busca fuzzy.")
-            query_solr = f"responsavel_nome:{text}~1"
+            query_solr = f"responsavel_nome:{text}~2"
             results = solr_client.search(query_solr)
 
         return list(results), 200
@@ -24,12 +24,12 @@ def solrVerificationResponsavel(text):
 def solrVerificationSala(text):
     try:
         logger.info(f"Buscando no Solr pelo termo: {text}")
-        
+
         query_solr = f"sala_nome:{text}*"
         results = solr_client.search(query_solr)
 
         if len(results) == 0:
-            query_solr = f"sala_nome:{text}~1"
+            query_solr = f"sala_nome:{text}~2"
             results = solr_client.search(query_solr)
 
         return list(results), 200
