@@ -9,6 +9,11 @@ def solrVerificationResponsavel(text):
         query_solr = f"responsavel_nome:{text}*"
 
         results = solr_client.search(query_solr)
+
+        if (len(results) <= 0):
+            query_solr = f"responsavel_nome:{text}~2"
+
+        results = solr_client.search(query_solr)
         
         return list(results), 200
 
@@ -24,6 +29,9 @@ def solrVerificationSala(text):
         query_solr = f"sala_nome:{text}*"
 
         results = solr_client.search(query_solr)
+
+        if (len(results) <= 0):
+            query_solr = f"sala_nome:{text}~2"
 
         return list(results), 200
     
