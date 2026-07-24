@@ -14,7 +14,7 @@ def solrVerificationResponsavel(text):
             query_solr = f"responsavel_nome:{text}~2"
             results = solr_client.search(query_solr)
 
-        return list(results), 200
+        return list(results)
 
     except Exception:
         logger.info("Erro ao buscar no Solr")
@@ -32,7 +32,7 @@ def solrVerificationSala(text):
             query_solr = f"sala_nome:{text}~2"
             results = solr_client.search(query_solr)
 
-        return list(results), 200
+        return list(results)
 
     except Exception:
         logger.info("Erro ao buscar no Solr")
