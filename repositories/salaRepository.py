@@ -56,7 +56,7 @@ class SalaRepository:
     @staticmethod
     def soft_delete(sala: TB_Sala, deleted_by: int):
 
-        sala.deleted_at = datetime.now(datetime.UTC)
+        sala.deleted_at = datetime.now(UTC)
         sala.deleted_by = deleted_by
         db.session.commit()
 
