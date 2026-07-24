@@ -1,4 +1,5 @@
 import json
+from flask import abort
 from flask_restful import marshal
 from helpers.redis_cache import redis_client
 from helpers.logging import logger
@@ -102,9 +103,8 @@ class ResponsavelService:
             responsavel_id
         )
 
-        responsavelVerification(
-            responsavel_id
-        )
+        if responsavel is None:
+            abort(404, description="Responsavel não encontrado.")
 
         resposta = marshal(
             responsavel,
@@ -181,7 +181,7 @@ class ResponsavelService:
 
 
     @staticmethod
-    def remover(responsavel_id):
+    def remover(responsavel_id, deleted_by):
 
         responsavel = ResponsavelRepository.get_by_id(
             responsavel_id
@@ -195,8 +195,9 @@ class ResponsavelService:
             responsavel_id
         )
 
-        ResponsavelRepository.delete(
-            responsavel
+        ResponsavelRepository.soft_delete(
+            responsavel,
+            deleted_by
         )
 
         deletarResponsavel(

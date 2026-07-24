@@ -220,9 +220,12 @@ class TB_ResponsavelResource(Resource):
         )
 
         try:
+            dados = request.get_json()
+
+            deleted_by = dados.get("deleted_by")
 
             ResponsavelService.remover(
-                responsavel_id
+                responsavel_id, deleted_by
             )
 
             return {

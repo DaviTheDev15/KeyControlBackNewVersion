@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, Date, Boolean
+from sqlalchemy import String, Integer, Date, Boolean, DateTime, func
 from helpers.database import db
 from helpers.validation_functions.genericValidations import DateFormat, validate_positive, montarDicionarioDeMensagemDeErro
 from helpers.validation_functions.responsavelSchemaValidation import validar_unique_cpf, validar_unique_siap, validar_unique_matricula, validar_unique_email, validarIdade
 from marshmallow import Schema, fields, validate, validates
 from flask_restful import fields as flaskFields
+from datetime import datetime, UTC
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -36,6 +37,9 @@ class TB_Responsavel(db.Model):
     senha: Mapped[str] = mapped_column(String(255), nullable=False)
     funcao: Mapped[str] = mapped_column(String(255), nullable=False, default="responsavel")
     ativo: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
     
     tb_reserva = relationship("TB_Reserva", back_populates="tb_responsavel")
 
@@ -95,6 +99,16 @@ class TB_ResponsavelSchema(Schema):
     ativo = fields.Boolean(
         required=True,
         error_messages=montarDicionarioDeMensagemDeErro("ativo", ["required", "invalid"], "b")
+    )
+
+    created_at = fields.DateTime(
+        required=False
+    )
+    deleted_at = fields.DateTime(
+        required=False
+    )
+    deleted_by = fields.Int(
+        required=False
     )
 
     @validates("responsavel_cpf")

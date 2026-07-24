@@ -1,15 +1,15 @@
 from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
-
+from datetime import datetime, UTC
 from models.Responsavel import TB_Responsavel
-
+from sqlalchemy import select
 
 class ResponsavelRepository:
 
     @staticmethod
     def get_all(query):
 
-        query = db.select(TB_Responsavel)
+        query = (db.select(TB_Responsavel).where(TB_Responsavel.deleted_at.is_(None)))
 
         query = aplicar_ordenacao(
             query,
@@ -26,7 +26,15 @@ class ResponsavelRepository:
 
     @staticmethod
     def get_by_id(responsavel_id: int):
-        return db.session.get(TB_Responsavel, responsavel_id)
+        query = (
+            db.select(TB_Responsavel)
+            .where(
+                TB_Responsavel.responsavel_id == responsavel_id,
+                responsavel_id.deleted_at.is_(None)
+            )
+        )
+
+        return db.session.execute(query).scalar_one_or_none()
 
 
     @staticmethod
@@ -48,8 +56,9 @@ class ResponsavelRepository:
 
 
     @staticmethod
-    def delete(responsavel: TB_Responsavel):
-        db.session.delete(responsavel)
+    def soft_delete(responsavel: TB_Responsavel, deleted_by:int):
+        responsavel.deleted_at = datetime.now(UTC)
+        responsavel.deleted_by = deleted_by
         db.session.commit()
 
 
