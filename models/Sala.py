@@ -9,9 +9,7 @@ from datetime import datetime, UTC
 tb_sala_fields = {
     'sala_id': flaskFields.Integer,
     'sala_nome': flaskFields.String,
-    'disponivel': flaskFields.Boolean,
-    'created_at': flaskFields.DateTime,
-    'deleted_at': flaskFields.DateTime
+    'disponivel': flaskFields.Boolean
 }
 
 class TB_Sala(db.Model):
