@@ -271,7 +271,8 @@ class ReservaService:
         )
 
         ReservaRepository.soft_delete(
-            reserva
+            reserva,
+            deleted_by
         )
 
         redis_client.delete_pattern(
