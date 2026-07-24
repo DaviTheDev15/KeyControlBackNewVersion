@@ -30,7 +30,7 @@ class ResponsavelRepository:
             db.select(TB_Responsavel)
             .where(
                 TB_Responsavel.responsavel_id == responsavel_id,
-                responsavel_id.deleted_at.is_(None)
+                TB_Responsavel.deleted_at.is_(None)
             )
         )
 
