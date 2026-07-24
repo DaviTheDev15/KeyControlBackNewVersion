@@ -84,7 +84,7 @@ class ChaveService:
         )
 
         if chave is None:
-            abort(404, descreption="Chave não encontrada.")
+            abort(404, description="Chave não encontrada.")
 
         resposta = marshal(
             chave,
