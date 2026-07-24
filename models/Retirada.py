@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, Date, Time, String, ForeignKey
+from sqlalchemy import Integer, Date, Time, String, ForeignKey, DateTime, func
 from helpers.database import db
 from marshmallow import Schema, fields, validate, ValidationError, validates, validates_schema
 from flask_restful import fields as flaskFields
@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 
 from helpers.validation_functions.genericValidations import DateFormat, TimeFormat, validate_positive, montarDicionarioDeMensagemDeErro
 from helpers.validation_functions.retiradaSchemaValidation import validateRetiradaRules
+from datetime import datetime, UTC
 
 tb_retirada_fields = {
     "retirada_id": flaskFields.Integer,
@@ -32,6 +33,9 @@ class TB_Retirada(db.Model):
     hora_prevista_devolucao: Mapped[Time] = mapped_column(Time, nullable=False)
     hora_devolucao: Mapped[Time] = mapped_column(Time, nullable=True)
     status: Mapped[String] = mapped_column(String(9), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
 
     tb_chave = relationship("TB_Chave", back_populates="tb_retirada")
 
@@ -81,6 +85,16 @@ class TB_RetiradaSchema(Schema):
             ["retirada", "atrasada", "devolvida"],
             error="O campo status aceita apenas uma dessas opções: retirada, atrasada, devolvida."
         )
+    )
+
+    created_at = fields.DateTime(
+        required=False
+    )
+    deleted_at = fields.DateTime(
+        required=False
+    )
+    deleted_by = fields.Int(
+        required=False
     )
 
     @validates_schema

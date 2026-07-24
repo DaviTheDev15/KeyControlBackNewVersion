@@ -81,6 +81,9 @@ class RetiradaService:
 
         retirada = RetiradaRepository.get_by_id(retirada_id)
 
+        if retirada is None:
+            abort(404, description="Retirada não encontrada.")
+
         retiradaVerification(retirada_id)
 
         resposta = marshal(retirada, tb_retirada_fields)
@@ -216,7 +219,7 @@ class RetiradaService:
     
 
     @staticmethod
-    def remover(retirada_id):
+    def remover(retirada_id, deleted_by):
 
         retirada = RetiradaRepository.get_by_id(retirada_id)
 
@@ -224,7 +227,7 @@ class RetiradaService:
 
         retiradaStatus(retirada_id)
 
-        RetiradaRepository.delete(retirada)
+        RetiradaRepository.soft_delete(retirada, deleted_by)
 
         redis_client.delete_pattern("retiradas:*")
         redis_client.delete_pattern("historicos:*")

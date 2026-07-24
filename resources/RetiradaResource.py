@@ -232,8 +232,12 @@ class TB_RetiradaResource(Resource):
 
         try:
 
+            dados = request.get_json()
+            deleted_by = dados.get("deleted_by")
+
             RetiradaService.remover(
-                retirada_id
+                retirada_id,
+                deleted_by
             )
 
             return {
