@@ -1,4 +1,5 @@
 import json
+from flask import abort
 from flask_restful import marshal
 from helpers.database import db
 from helpers.logging import logger
@@ -82,9 +83,8 @@ class ChaveService:
             chave_id
         )
 
-        chaveVerification(
-            chave_id
-        )
+        if chave is None:
+            abort(404, descreption="Chave não encontrada.")
 
         resposta = marshal(
             chave,
@@ -161,7 +161,7 @@ class ChaveService:
 
 
     @staticmethod
-    def remover(chave_id):
+    def remover(chave_id, deleted_by):
 
         chave = ChaveRepository.get_by_id(
             chave_id
@@ -176,8 +176,9 @@ class ChaveService:
                 "erro": "Chave está em uso, não pode ser removida"
             }, 400
 
-        ChaveRepository.delete(
-            chave
+        ChaveRepository.soft_delete(
+            chave,
+            deleted_by
         )
 
         redis_client.delete_pattern(

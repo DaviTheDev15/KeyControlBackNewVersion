@@ -1,18 +1,27 @@
 from helpers.database import db
 
 from models.Chave import TB_Chave
-
+from sqlalchemy import select
+from datetime import datetime, UTC
 
 class ChaveRepository:
 
     @staticmethod
     def get_all(query):
+        query = (db.select(TB_Chave).where(TB_Chave.deleted_at.is_(None)))
         return db.session.execute(query).scalars().all()
 
 
     @staticmethod
     def get_by_id(chave_id: int):
-        return db.session.get(TB_Chave, chave_id)
+        query = (
+            db.select(TB_Chave)
+            .where(
+                TB_Chave.chave_id == chave_id,
+                TB_Chave.deleted_at.is_(None)
+            )
+        )
+        return db.session.execute(query).scalar_one_or_none()
 
 
     @staticmethod
@@ -29,8 +38,9 @@ class ChaveRepository:
 
 
     @staticmethod
-    def delete(chave: TB_Chave):
-        db.session.delete(chave)
+    def soft_delete(chave: TB_Chave, deleted_by:int):
+        chave.deleted_at = datetime.now(UTC)
+        chave.deleted_by = deleted_by
         db.session.commit()
 
 

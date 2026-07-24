@@ -230,13 +230,14 @@ class TB_ChaveResource(Resource):
         )
 
         try:
+            dados = request.get_json()
 
-            resposta = ChaveService.remover(
-                chave_id
+            deleted_by = dados.get("deleted_by")
+
+            ChaveService.remover(
+                chave_id,
+                deleted_by
             )
-
-            if resposta is not None:
-                return resposta
 
             return {
                 "mensagem": "Chave removida com sucesso"
