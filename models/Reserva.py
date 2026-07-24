@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, Date, Time, String, ForeignKey
+from sqlalchemy import Integer, Date, Time, String, ForeignKey, DateTime, func
 from helpers.database import db
 from helpers.validation_functions.genericValidations import TimeFormat, DateFormat, DiasReservaField, validate_positive, montarDicionarioDeMensagemDeErro
 from helpers.validation_functions.reservaSchemaValidation import validateReservaRules
 from marshmallow import Schema, fields, validate, validates_schema
 from flask_restful import fields as flaskFields
+from datetime import datetime, UTC
 
 tb_reserva_fields = {
     'reserva_id': flaskFields.Integer,
@@ -31,6 +32,9 @@ class TB_Reserva(db.Model):
     data_fim: Mapped[Date] = mapped_column(Date, nullable=False)
     frequencia: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="ativa")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
 
     tb_sala = relationship("TB_Sala", back_populates="tb_reserva")
 
@@ -95,6 +99,16 @@ class TB_ReservaSchema(Schema):
         ),
         required=False,
         load_only=True
+    )
+
+    created_at = fields.DateTime(
+        required=False
+    )
+    deleted_at = fields.DateTime(
+        required=False
+    )
+    deleted_by = fields.Int(
+        required=False
     )
 
     @validates_schema

@@ -17,6 +17,7 @@ def existe_conflito_reserva_raw(
         FROM tb_reserva r
         LEFT JOIN tb_reserva_dia d ON d.reserva_id = r.reserva_id
         WHERE r.status = 'ativa'
+          AND r.deleted_at IS NULL  
           AND r.sala_id = :sala_id
           AND (:hora_inicio < r.hora_fim AND :hora_fim > r.hora_inicio)
           AND r.data_inicio <= :data_inicio

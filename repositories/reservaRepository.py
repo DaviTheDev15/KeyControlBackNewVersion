@@ -2,18 +2,28 @@ from helpers.database import db
 
 from models.Reserva import TB_Reserva
 from models.ReservaDia import TB_ReservaDia
+from sqlalchemy import select
+from datetime import datetime, UTC
 
 
 class ReservaRepository:
 
     @staticmethod
     def get_all(query):
+        query = (db.select(TB_Reserva).where(TB_Reserva.deleted_at.is_(None)))
         return db.session.execute(query).scalars().all()
 
 
     @staticmethod
     def get_by_id(reserva_id):
-        return db.session.get(TB_Reserva, reserva_id)
+        query = (
+            db.select(TB_Reserva)
+            .where(
+                TB_Reserva.reserva_id == reserva_id,
+                TB_Reserva.deleted_at.is_(None)
+            )
+        )
+        return db.session.execute(query).scalar_one_or_none()
 
 
     @staticmethod
@@ -35,8 +45,9 @@ class ReservaRepository:
 
 
     @staticmethod
-    def delete(reserva):
-        db.session.delete(reserva)
+    def soft_delete(reserva: TB_Reserva, deleted_by: int):
+        reserva.deleted_at = datetime.now(UTC)
+        reserva.deleted_by = deleted_by
         db.session.commit()
 
 

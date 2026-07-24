@@ -231,9 +231,13 @@ class TB_ReservaResource(Resource):
         )
 
         try:
+            dados = request.get_json()
+
+            deleted_by = dados.get("deleted_by")
 
             ReservaService.remover(
-                reserva_id
+                reserva_id,
+                deleted_by
             )
 
             return {

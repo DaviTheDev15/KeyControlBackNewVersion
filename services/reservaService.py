@@ -1,4 +1,5 @@
 import json
+from flask import abort
 from flask_restful import marshal
 from helpers.database import db
 from helpers.redis_cache import redis_client
@@ -93,9 +94,8 @@ class ReservaService:
             reserva_id
         )
 
-        reservaVerification(
-            reserva_id
-        )
+        if reserva is None:
+            abort(404, description="Reserva não encontrada.")
 
         resposta = marshal(
             reserva,
@@ -256,7 +256,7 @@ class ReservaService:
 
 
     @staticmethod
-    def remover(reserva_id):
+    def remover(reserva_id, deleted_by):
 
         reserva = ReservaRepository.get_by_id(
             reserva_id
@@ -270,7 +270,7 @@ class ReservaService:
             reserva_id
         )
 
-        ReservaRepository.delete(
+        ReservaRepository.soft_delete(
             reserva
         )
 
