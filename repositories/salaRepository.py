@@ -1,3 +1,4 @@
+import datetime
 from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 from models.Sala import TB_Sala
@@ -53,8 +54,10 @@ class SalaRepository:
 
 
     @staticmethod
-    def delete(sala: TB_Sala):
-        db.session.delete(sala)
+    def soft_delete(sala: TB_Sala, deleted_by: int):
+
+        sala.deleted_at = datetime.now(datetime.UTC)
+        sala.deleted_by = deleted_by
         db.session.commit()
 
 

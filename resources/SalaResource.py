@@ -226,9 +226,12 @@ class TB_SalaResource(Resource):
         )
 
         try:
+            dados = request.get_json()
+
+            deleted_by = dados.get("deleted_by")
 
             SalaService.remover(
-                sala_id
+                sala_id, deleted_by
             )
 
             return {

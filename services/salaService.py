@@ -165,7 +165,7 @@ class SalaService:
 
 
     @staticmethod
-    def remover(sala_id):
+    def remover(sala_id, deleted_by):
 
         sala = SalaRepository.get_by_id(
             sala_id
@@ -175,8 +175,9 @@ class SalaService:
             sala_id
         )
 
-        SalaRepository.delete(
-            sala
+        SalaRepository.soft_delete(
+            sala,
+            deleted_by
         )
 
         deletarSala(
