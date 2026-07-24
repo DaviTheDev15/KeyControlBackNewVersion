@@ -3,12 +3,13 @@ from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 from models.Sala import TB_Sala
 from models.Chave import TB_Chave
+from sqlalchemy import select
 
 class SalaRepository:
     
     @staticmethod
     def get_all(query):
-        query = db.select(TB_Sala)
+        query = (db.select(TB_Sala).where(TB_Sala.deleted_at.is_(None)))
 
         query = aplicar_ordenacao(query,{
             "id":TB_Sala.sala_id,
@@ -22,7 +23,15 @@ class SalaRepository:
 
     @staticmethod
     def get_by_id(sala_id: int):
-        return db.session.get(TB_Sala, sala_id)
+        query = (
+            db.select(TB_Sala)
+            .where(
+                TB_Sala.sala_id == sala_id,
+                TB_Sala.deleted_at.is_(None)
+            )
+        )
+
+        return db.session.execute(query).scalar_one_or_none()
     
 
     @staticmethod
