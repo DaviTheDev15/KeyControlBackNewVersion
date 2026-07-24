@@ -1,4 +1,5 @@
 import json
+from flask import abort
 from flask_restful import marshal
 from helpers.database import db
 from helpers.redis_cache import redis_client
@@ -87,7 +88,9 @@ class SalaService:
 
         sala = SalaRepository.get_by_id(sala_id)
 
-        salaVerification(sala_id)
+        
+        if sala is None:
+            abort(404, description="Sala não encontrada.")
 
         resposta = marshal(
             sala,
