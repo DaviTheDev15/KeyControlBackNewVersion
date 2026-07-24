@@ -20,8 +20,9 @@ class TB_Sala(db.Model):
     sala_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     sala_nome: Mapped[str] = mapped_column(String(255), nullable=False)
     disponivel: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
 
     tb_chave = relationship("TB_Chave", back_populates="tb_sala")
     tb_reserva = relationship("TB_Reserva", back_populates="tb_sala")
@@ -40,5 +41,11 @@ class TB_SalaSchema(Schema):
         error_messages=montarDicionarioDeMensagemDeErro("disponivel", ["required", "invalid"]))
     
     created_at = fields.DateTime(
+        required=False
+    )
+    deleted_at = fields.DateTime(
+        required=False
+    )
+    deleted_by = fields.Int(
         required=False
     )
