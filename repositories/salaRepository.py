@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, UTC
 from helpers.database import db
 from helpers.auxiliaryFunctionsResources.helpFunctionsForSql import aplicar_ordenacao
 from models.Sala import TB_Sala
