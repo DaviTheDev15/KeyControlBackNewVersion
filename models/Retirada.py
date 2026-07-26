@@ -37,7 +37,7 @@ class TB_Retirada(db.Model):
     status: Mapped[String] = mapped_column(String(9), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer,ForeignKey('tb_responsavel.responsavel_id'), nullable=True)
 
     tb_chave = relationship("TB_Chave", back_populates="tb_retirada")
 
