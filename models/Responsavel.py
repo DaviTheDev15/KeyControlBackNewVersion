@@ -45,6 +45,8 @@ class TB_Responsavel(db.Model):
 
     tb_retirada = relationship("TB_Retirada", back_populates="tb_responsavel")
 
+    tb_sala = relationship("TB_Sala", back_populates="tb_responsavel")
+
     def set_senha(self, senha_plain: str):
         self.senha = ph.hash(senha_plain)
  

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, Boolean, DateTime, func
+from sqlalchemy import String, Integer, Boolean, DateTime,ForeignKey, func
 from helpers.database import db
 from helpers.validation_functions.genericValidations import montarDicionarioDeMensagemDeErro
 from marshmallow import Schema, fields, validate, validates
@@ -20,10 +20,11 @@ class TB_Sala(db.Model):
     disponivel: Mapped[bool] = mapped_column(Boolean, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer, ForeignKey('tb_responsavel.responsavel_id'), nullable=True)
 
     tb_chave = relationship("TB_Chave", back_populates="tb_sala")
     tb_reserva = relationship("TB_Reserva", back_populates="tb_sala")
+    tb_responsavel = relationship("TB_Responsavel", back_populates="tb_sala")
 
 
 class TB_SalaSchema(Schema):

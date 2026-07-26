@@ -17,6 +17,9 @@ from helpers.auxiliaryFunctionsResources.solrFunctions import (
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
     salaVerification
 )
+from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
+    responsavelVerification
+)
 from models.Sala import (
     TB_Sala,
     tb_sala_fields
@@ -176,6 +179,10 @@ class SalaService:
 
         salaVerification(
             sala_id
+        )
+
+        responsavelVerification(
+            deleted_by
         )
 
         SalaRepository.soft_delete(
