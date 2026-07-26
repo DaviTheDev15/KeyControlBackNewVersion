@@ -38,7 +38,16 @@ class TB_Reserva(db.Model):
 
     tb_sala = relationship("TB_Sala", back_populates="tb_reserva")
 
-    tb_responsavel = relationship("TB_Responsavel", back_populates="tb_reserva")
+    tb_responsavel = relationship(
+        "TB_Responsavel",
+        foreign_keys=[responsavel_id],
+        back_populates="tb_reserva"
+    )
+
+    tb_responsavel_delete = relationship(
+        "TB_Responsavel",
+        foreign_keys=[deleted_by]
+    )
 
     tb_reserva_dia = relationship("TB_ReservaDia", cascade="all,delete-orphan", back_populates="tb_reserva")
 

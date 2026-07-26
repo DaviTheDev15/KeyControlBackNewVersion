@@ -41,7 +41,16 @@ class TB_Responsavel(db.Model):
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     deleted_by: Mapped[int] = mapped_column(Integer,nullable=True)
     
-    tb_reserva = relationship("TB_Reserva", back_populates="tb_responsavel")
+    tb_reserva = relationship(
+        "TB_Reserva",
+        foreign_keys="TB_Reserva.responsavel_id",
+        back_populates="tb_responsavel"
+    )
+
+    tb_reserva_deletada = relationship(
+        "TB_Reserva",
+        foreign_keys="TB_Reserva.deleted_by"
+    )
 
     tb_retirada = relationship("TB_Retirada", back_populates="tb_responsavel")
 
