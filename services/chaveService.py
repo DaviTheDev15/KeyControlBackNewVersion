@@ -12,7 +12,8 @@ from helpers.auxiliaryFunctionsResources.redisCacheFunctions import (
 )
 from helpers.auxiliaryFunctionsResources.genericValidationsForResource import (
     salaVerification,
-    chaveVerification
+    chaveVerification,
+    responsavelVerification
 )
 from models.Chave import (
     TB_Chave,
@@ -169,6 +170,10 @@ class ChaveService:
 
         chaveVerification(
             chave_id
+        )
+
+        responsavelVerification(
+            deleted_by
         )
 
         if not chave.disponivel:
