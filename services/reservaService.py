@@ -270,6 +270,10 @@ class ReservaService:
             reserva_id
         )
 
+        responsavelVerification(
+            deleted_by
+        )
+
         ReservaRepository.soft_delete(
             reserva,
             deleted_by

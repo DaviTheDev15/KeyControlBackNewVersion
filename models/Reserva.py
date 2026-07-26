@@ -34,7 +34,7 @@ class TB_Reserva(db.Model):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="ativa")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    deleted_by: Mapped[int] = mapped_column(Integer, nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer, ForeignKey('tb_responsavel.responsavel_id'),nullable=True)
 
     tb_sala = relationship("TB_Sala", back_populates="tb_reserva")
 
@@ -43,6 +43,8 @@ class TB_Reserva(db.Model):
     tb_reserva_dia = relationship("TB_ReservaDia", cascade="all,delete-orphan", back_populates="tb_reserva")
 
     tb_retirada = relationship("TB_Retirada", back_populates="tb_reserva")
+
+    tb_responsavel = relationship("TB_Responsavel", back_populates="tb_reserva")    
 
 
 class TB_ReservaSchema(Schema):
