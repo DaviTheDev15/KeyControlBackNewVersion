@@ -52,7 +52,16 @@ class TB_Responsavel(db.Model):
         foreign_keys="TB_Reserva.deleted_by"
     )
 
-    tb_retirada = relationship("TB_Retirada", back_populates="tb_responsavel")
+    tb_retirada = relationship(
+        "TB_Retirada",
+        foreign_keys="TB_Retirada.responsavel_id",
+        back_populates="tb_responsavel"
+    )
+
+    tb_retirada_deletada = relationship(
+        "TB_Retirada",
+        foreign_keys="TB_Retirada.deleted_by"
+    )
 
     tb_sala = relationship("TB_Sala", back_populates="tb_responsavel")
 

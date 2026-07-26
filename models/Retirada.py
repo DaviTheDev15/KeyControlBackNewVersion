@@ -16,6 +16,7 @@ tb_retirada_fields = {
     "reserva_id":flaskFields.Integer,
     "data_retirada":DateFormat,
     "hora_retirada":TimeFormat,
+    "data_devolucao":DateFormat,
     "hora_prevista_devolucao":TimeFormat,
     "hora_devolucao":TimeFormat,
     "status": flaskFields.String # retirada | devolvida | atrasada
@@ -30,6 +31,7 @@ class TB_Retirada(db.Model):
     reserva_id: Mapped[int] = mapped_column(Integer, ForeignKey("tb_reserva.reserva_id"), nullable=True)
     data_retirada: Mapped[Date] = mapped_column(Date, nullable=False)
     hora_retirada: Mapped[Time] = mapped_column(Time, nullable=False)
+    data_devolucao: Mapped[Date] = mapped_column(Date, nullable=True)
     hora_prevista_devolucao: Mapped[Time] = mapped_column(Time, nullable=False)
     hora_devolucao: Mapped[Time] = mapped_column(Time, nullable=True)
     status: Mapped[String] = mapped_column(String(9), nullable=False)
@@ -39,7 +41,16 @@ class TB_Retirada(db.Model):
 
     tb_chave = relationship("TB_Chave", back_populates="tb_retirada")
 
-    tb_responsavel = relationship("TB_Responsavel", back_populates="tb_retirada")
+    tb_responsavel = relationship(
+        "TB_Responsavel",
+        foreign_keys=[responsavel_id],
+        back_populates="tb_retirada"
+    )
+
+    tb_responsavel_delete = relationship(
+        "TB_Responsavel",
+        foreign_keys=[deleted_by]
+    )
 
     tb_reserva = relationship("TB_Reserva", back_populates="tb_retirada")
 
@@ -74,6 +85,10 @@ class TB_RetiradaSchema(Schema):
     hora_prevista_devolucao = fields.Time(
         required=True,
         error_messages=montarDicionarioDeMensagemDeErro("hora_prevista_devolucao", ["required", "null", "invalid"]))
+    
+    data_devolucao = fields.Date(
+        required=False
+    )
     
     hora_devolucao = fields.Time(
         required=False,

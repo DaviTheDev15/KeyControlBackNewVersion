@@ -33,6 +33,8 @@ class RetiradaRepository:
 
     @staticmethod
     def update():
+        retirada = TB_Retirada
+        retirada.data_devolucao = datetime.now(UTC).date()
         db.session.commit()
 
     @staticmethod

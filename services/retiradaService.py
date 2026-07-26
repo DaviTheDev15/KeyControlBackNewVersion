@@ -227,6 +227,10 @@ class RetiradaService:
 
         retiradaStatus(retirada_id)
 
+        responsavelVerification(
+            deleted_by
+        )
+
         RetiradaRepository.soft_delete(retirada, deleted_by)
 
         redis_client.delete_pattern("retiradas:*")
