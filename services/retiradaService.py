@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, UTC
 import json
 from flask import abort
 from flask_restful import marshal
@@ -199,7 +199,7 @@ class RetiradaService:
             status_anterior in ("retirada", "atrasada")
             and retirada.status == "devolvida"
         ):
-
+            retirada.data_devolucao = datetime.now(UTC).date()
             chave = ChaveRepository.get_by_id(retirada.chave_id)
 
             sala = SalaRepository.get_by_id(chave.sala_id)
