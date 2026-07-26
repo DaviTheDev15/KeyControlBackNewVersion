@@ -191,6 +191,10 @@ class ResponsavelService:
             responsavel_id
         )
 
+        responsavelVerification(
+            deleted_by
+        )
+
         responsavelIsActive(
             responsavel_id
         )
