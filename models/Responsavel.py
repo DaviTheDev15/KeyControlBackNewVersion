@@ -39,7 +39,7 @@ class TB_Responsavel(db.Model):
     ativo: Mapped[bool] = mapped_column(Boolean, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
     deleted_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    deleted_by: Mapped[int] = mapped_column(Integer, ForeignKey('tb_responsavel.responsavel_id'),nullable=True)
+    deleted_by: Mapped[int] = mapped_column(Integer,nullable=True)
     
     tb_reserva = relationship("TB_Reserva", back_populates="tb_responsavel")
 
@@ -48,8 +48,6 @@ class TB_Responsavel(db.Model):
     tb_sala = relationship("TB_Sala", back_populates="tb_responsavel")
 
     tb_chave = relationship("TB_Chave", back_populates="tb_responsavel")
-
-    tb_responsavel = relationship("TB_Responsavel", back_populates="tb_responsavel")
 
     def set_senha(self, senha_plain: str):
         self.senha = ph.hash(senha_plain)
