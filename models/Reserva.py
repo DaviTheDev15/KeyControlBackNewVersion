@@ -44,7 +44,6 @@ class TB_Reserva(db.Model):
 
     tb_retirada = relationship("TB_Retirada", back_populates="tb_reserva")
 
-    tb_responsavel = relationship("TB_Responsavel", back_populates="tb_reserva")    
 
 
 class TB_ReservaSchema(Schema):
