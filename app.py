@@ -33,5 +33,6 @@ api.add_resource(AuthResource, "/login")
 api.add_resource(MeResource, "/me")
 api.add_resource(LogoutResource, "/logout")
 
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
