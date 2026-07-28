@@ -13,6 +13,7 @@ def sqlRequisicaoGetAll():
                 r.data_retirada,
                 r.hora_retirada,
                 r.hora_prevista_devolucao,
+                r.data_devolucao,
                 r.hora_devolucao,
                 r.status,
 
@@ -53,6 +54,7 @@ def sqlRequisicaoGetAll():
                 **dict(row),
                 "data_retirada": row["data_retirada"].isoformat() if row["data_retirada"] else None,
                 "hora_retirada": row["hora_retirada"].isoformat() if row["hora_retirada"] else None,
+                "data_devolucao": row["data_devolucao"].isoformat() if row["data_devolucao"] else None,
                 "hora_prevista_devolucao": row["hora_prevista_devolucao"].isoformat() if row["hora_prevista_devolucao"] else None,
                 "hora_devolucao": row["hora_devolucao"].isoformat() if row["hora_devolucao"] else None,
             }
@@ -72,6 +74,7 @@ def sqlRequisicaoGetById(retirada_id):
                 r.data_retirada,
                 r.hora_retirada,
                 r.hora_prevista_devolucao,
+                r.data_devolucao,
                 r.hora_devolucao,
                 r.status,
 
@@ -105,6 +108,9 @@ def sqlRequisicaoGetById(retirada_id):
 
         if resultado.get("hora_retirada"):
             resultado["hora_retirada"] = resultado["hora_retirada"].strftime("%H:%M")
+
+        if resultado.get("data_devolucao"):
+            resultado["data_devolucao"] = resultado["data_devolucao"].isoformat()
 
         if resultado.get("hora_prevista_devolucao"):
             resultado["hora_prevista_devolucao"] = resultado["hora_prevista_devolucao"].strftime("%H:%M")
