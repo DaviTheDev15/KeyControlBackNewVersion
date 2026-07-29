@@ -25,11 +25,23 @@ def sqlRequisicaoGetAll():
 
                 resp.responsavel_id,
                 resp.responsavel_nome
+
             FROM tb_retirada r
-            JOIN tb_chave c ON c.chave_id = r.chave_id
-            JOIN tb_sala s ON s.sala_id = c.sala_id
-            JOIN tb_responsavel resp ON resp.responsavel_id = r.responsavel_id
-            """
+
+            JOIN tb_chave c
+                ON c.chave_id = r.chave_id
+                AND c.deleted_at IS NULL
+
+            JOIN tb_sala s
+                ON s.sala_id = c.sala_id
+                AND s.deleted_at IS NULL
+
+            JOIN tb_responsavel resp
+                ON resp.responsavel_id = r.responsavel_id
+                AND resp.deleted_at IS NULL
+
+            WHERE r.deleted_at IS NULL
+        """
 
         params = {}
 
@@ -86,12 +98,25 @@ def sqlRequisicaoGetById(retirada_id):
 
                 resp.responsavel_id,
                 resp.responsavel_nome
+
             FROM tb_retirada r
-            JOIN tb_chave c ON c.chave_id = r.chave_id
-            JOIN tb_sala s ON s.sala_id = c.sala_id
-            JOIN tb_responsavel resp ON resp.responsavel_id = r.responsavel_id
-            WHERE r.retirada_id = :retirada_id
-            """
+
+            JOIN tb_chave c
+                ON c.chave_id = r.chave_id
+                AND c.deleted_at IS NULL
+
+            JOIN tb_sala s
+                ON s.sala_id = c.sala_id
+                AND s.deleted_at IS NULL
+
+            JOIN tb_responsavel resp
+                ON resp.responsavel_id = r.responsavel_id
+                AND resp.deleted_at IS NULL
+
+            WHERE
+                r.deleted_at IS NULL
+                AND r.retirada_id = :retirada_id
+        """
 
         row = db.session.execute(
             text(sql),
