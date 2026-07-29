@@ -67,7 +67,13 @@ services:
         condition: service_started
       solr:
         condition: service_healthy
-        
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
 volumes:
   pg_data:
   redis_data:
