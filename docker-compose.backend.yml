@@ -69,11 +69,12 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./frontend
+    image: jv1nicius/keycontrolfront:latest
     container_name: frontend
     ports:
       - "80:80"
+    depends_on:
+      - api-backend
 volumes:
   pg_data:
   redis_data:
