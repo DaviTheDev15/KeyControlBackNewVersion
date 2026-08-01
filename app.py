@@ -2,6 +2,7 @@ from helpers.application import app, api
 from helpers.database import db
 from helpers.CORS import cors
 
+
 from resources.IndexResource import IndexResource
 from resources.ResponsavelResource import TB_ResponsaveisResource, TB_ResponsavelResource
 from resources.SalaResource import TB_SalasResource, TB_SalaResource
